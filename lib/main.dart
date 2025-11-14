@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/page/login/login.dart';
+import 'package:runmates/service/notifService.dart';
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+    await NotifiService().initNotifications();
   runApp(const MyApp());
 }
 

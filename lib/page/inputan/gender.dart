@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:runmates/page/inputan/age.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   const GenderSelectionPage({super.key});
@@ -96,10 +97,10 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                           );
                           return;
                         }
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => AgePage()),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AgePage()),
+                        );
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: _primaryColor,
