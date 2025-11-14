@@ -13,7 +13,7 @@ class NotifiService {
   Future<void> initNotifications() async {
     if (initialized) return;
 
-    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
     const initSettings = InitializationSettings(android: androidInit);
 
     // callback (optional) untuk response klik notifikasi

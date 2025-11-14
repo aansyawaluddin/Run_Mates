@@ -27,17 +27,10 @@ class NotificationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF83E5C3),
+                  color: Color(0xFF0F172A),
                   shape: BoxShape.circle,
                 ),
-                child: Transform.rotate(
-                  angle: -0.8,
-                  child: const Icon(
-                    Icons.send,
-                    color: Color(0xFF2B2B2B),
-                    size: 20,
-                  ),
-                ),
+                child: Image.asset('assets/logo.png', height: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
