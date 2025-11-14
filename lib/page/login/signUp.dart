@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:runmates/page/inputan/gender.dart';
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
@@ -88,12 +89,12 @@ class SignUp extends StatelessWidget {
                   height: 60,
                   child: TextButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const GenderSelectionPage(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GenderSelectionPage(),
+                        ),
+                      );
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Color(0XFF00F0FF),
