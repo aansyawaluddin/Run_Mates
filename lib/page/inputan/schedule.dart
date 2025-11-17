@@ -21,9 +21,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     'Minggu',
   ];
 
-  final Color _activeColor = const Color(0xFF00FFFF);
-  final Color _inactiveColor = const Color(0xFF333333);
-  final Color _backgroundColor = const Color(0XFF1A1A1A);
+  final Color _activeColor = const Color(0XFFFF5050);
+  final Color _inactiveColor = const Color(0XFFFAFAFA);
+  final Color _backgroundColor = const Color(0XFFFAFAFA);
 
   // tombol hari ditekan
   void _toggleDay(String day) {
@@ -49,19 +49,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 const Text(
                   'Hari apa aja kamu ada waktu luang?',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
+                    height: 0.9,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 const Text(
                   'Kami tau kamu sibuk, pilih hari yang realistis buat kamu latihan',
-                  style: TextStyle(color: Colors.white, fontSize: 17),
+                  style: TextStyle(color: Colors.black, fontSize: 17),
                 ),
                 const SizedBox(height: 40),
 
@@ -69,7 +70,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 const Text(
                   'Pilih hari',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -84,6 +85,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
                 const SizedBox(height: 10),
 
+                // Tombol Continue
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -95,10 +97,25 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder:(context) => NotificationPermissionScreen()));
+                          if (_selectedDays.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Pilih setidaknya satu hari.'),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                            return;
+                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const NotificationPermissionScreen(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.cyan,
+                          backgroundColor: const Color(0XFFFF5050),
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40),
@@ -125,9 +142,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  // tombol hari
+  // Widget hari
   Widget _buildDayButton(String day) {
     final bool isSelected = _selectedDays.contains(day);
+
+    final Color containerBgColor = isSelected ? _activeColor : _inactiveColor;
+    final Color textColor = isSelected ? _inactiveColor : _activeColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -137,17 +157,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 18.0),
           decoration: BoxDecoration(
-            color: _inactiveColor,
+            color: containerBgColor,
             borderRadius: BorderRadius.circular(15.0),
-            border: isSelected
-                ? Border.all(color: _activeColor, width: 2.5)
-                : null,
+            border: Border.all(color: _activeColor, width: 2.5),
           ),
           child: Text(
             day,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: textColor,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),

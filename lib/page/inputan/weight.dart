@@ -66,7 +66,7 @@ class _WeightScreenState extends State<WeightScreen> {
     final width = MediaQuery.of(context).size.width;
     final screenWidth = width;
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -81,7 +81,7 @@ class _WeightScreenState extends State<WeightScreen> {
                     Text(
                       "Berapa berat badan\nkamu sekarang?",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
                       ),
@@ -90,7 +90,7 @@ class _WeightScreenState extends State<WeightScreen> {
                     Text(
                       "Tenang, ini cuma buat kami kasih latihan yang aman dan sesuai sama kemampuan kamu",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 17,
                         fontWeight: FontWeight.normal,
                       ),
@@ -122,7 +122,7 @@ class _WeightScreenState extends State<WeightScreen> {
                     child: Text(
                       '${value.toInt()}',
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white54,
+                        color: isSelected ? Colors.black : Colors.black,
                         fontSize: isSelected ? 30 : 18,
                         fontWeight: isSelected
                             ? FontWeight.w800
@@ -154,7 +154,7 @@ class _WeightScreenState extends State<WeightScreen> {
                             width: double.infinity,
                             height: 96,
                             decoration: BoxDecoration(
-                              color: Colors.cyan,
+                              color: Color(0XFFFF5050),
                             ),
                           ),
                         ),
@@ -213,7 +213,7 @@ class _WeightScreenState extends State<WeightScreen> {
                           width: 6,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF006E),
+                            color: Colors.black,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -221,13 +221,13 @@ class _WeightScreenState extends State<WeightScreen> {
 
                       // pointer
                       Positioned(
-                        bottom: -18,
+                        bottom: -30,
                         child: SizedBox(
                           width: 32,
                           height: 20,
                           child: CustomPaint(
                             painter: TriangleUpPainter(
-                              color: const Color(0xFFFF006E),
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -250,7 +250,7 @@ class _WeightScreenState extends State<WeightScreen> {
                   Text(
                     _displayValue(),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
                     ),
@@ -259,7 +259,7 @@ class _WeightScreenState extends State<WeightScreen> {
                   const Text(
                     'Kg',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -289,7 +289,7 @@ class _WeightScreenState extends State<WeightScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.cyan,
+                      backgroundColor: Color(0XFFFF5050),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),

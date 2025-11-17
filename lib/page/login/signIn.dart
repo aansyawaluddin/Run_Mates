@@ -10,8 +10,8 @@ class SingIn extends StatefulWidget {
 }
 
 class _SingInState extends State<SingIn> {
-  final Color _primaryColor = const Color(0XFF00F0FF);
-  final Color _darkBackground = const Color(0XFF1A1A1A);
+  final Color _primaryColor = const Color(0XFFFF5050);
+  final Color _darkBackground = const Color(0XFFFAFAFA);
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -38,18 +38,18 @@ class _SingInState extends State<SingIn> {
                       icon: Container(
                         padding: const EdgeInsets.all(3.0),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00F0FF),
+                          color: Color(0XFFFF5050),
                           shape: BoxShape.circle,
                         ),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: const BoxDecoration(
-                            color: Colors.black,
+                            color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.arrow_back,
-                            color: Color(0xFF00F0FF),
+                            color: Color(0XFFFF5050),
                             size: 24,
                           ),
                         ),
@@ -61,16 +61,17 @@ class _SingInState extends State<SingIn> {
                       child: Text(
                         'Welcome \n runners !',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
+                          height: 1.1,
                         ),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 80.0),
+                const SizedBox(height: 90.0),
 
                 // Email
                 TextField(
@@ -79,13 +80,24 @@ class _SingInState extends State<SingIn> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Email',
-                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    hintStyle: TextStyle(color: Colors.black),
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 2.0,
+                      ),
+                    ),
+
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 18.0,
                       horizontal: 16.0,
@@ -103,13 +115,24 @@ class _SingInState extends State<SingIn> {
                   keyboardType: TextInputType.visiblePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    hintStyle: TextStyle(color: Colors.black),
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 2.0,
+                      ),
+                    ),
+
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 18.0,
                       horizontal: 16.0,
@@ -169,26 +192,20 @@ class _SingInState extends State<SingIn> {
                 Row(
                   children: [
                     Expanded(
-                      child: Divider(
-                        color: Colors.purple.shade200,
-                        thickness: 1,
-                      ),
+                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         'Or',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.black,
                           fontSize: 16,
                         ),
                       ),
                     ),
                     Expanded(
-                      child: Divider(
-                        color: Colors.purple.shade200,
-                        thickness: 1,
-                      ),
+                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
                     ),
                   ],
                 ),
@@ -198,69 +215,72 @@ class _SingInState extends State<SingIn> {
                 Center(
                   child: Text(
                     'sign up with',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ),
 
                 const SizedBox(height: 24.0),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.google,
-                      color: Colors.red,
-                      onTap: () {
-                        debugPrint('Sign up with Google');
-                      },
+                Center(
+                  child: Container(
+                    width: 250,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 7,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.apple,
-                      color: Colors.black,
-                      onTap: () {
-                        debugPrint('Sign up with Apple');
+                    child: OutlinedButton(
+                      onPressed: () {
+                        print('Sign up with Google (new button)');
                       },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.grey.shade400,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(80.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/google.png',
+                            height: 24.0,
+                            width: 24.0,
+                          ),
+                          const SizedBox(width: 12.0),
+                          const Text(
+                            'Sign in with Google',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.facebook,
-                      color: Colors.blue.shade800,
-                      onTap: () {
-                        debugPrint('Sign up with Facebook');
-                      },
-                    ),
-                  ],
+                  ),
                 ),
 
                 const SizedBox(height: 32.0),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialIcon({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 30),
         ),
       ),
     );

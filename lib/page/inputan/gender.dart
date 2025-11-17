@@ -12,8 +12,8 @@ class GenderSelectionPage extends StatefulWidget {
 enum Gender { male, female }
 
 class _GenderSelectionPageState extends State<GenderSelectionPage> {
-  final Color _primaryColor = const Color(0XFF00F0FF);
-  final Color _darkBackground = const Color(0XFF1A1A1A);
+  final Color _primaryColor = const Color(0XFFFF5050);
+  final Color _darkBackground = const Color(0XFFFAFAFA);
 
   Gender? _selectedGender;
 
@@ -35,10 +35,9 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
               Text(
                 'Yuk kenalan dulu, kamu cowok atau cewek?',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Outfit',
                 ),
               ),
 
@@ -48,10 +47,9 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                 'Pria dan wanita butuh pendekatan latihan yang beda, kami sesuaikan buat kamu',
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 17,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: 'Outfit',
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
@@ -153,7 +151,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0XFFF3F3F4),
           borderRadius: BorderRadius.circular(24.0),
           border: Border.all(
             color: isSelected ? _primaryColor : Colors.transparent,

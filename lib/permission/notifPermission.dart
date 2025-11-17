@@ -106,7 +106,7 @@ class NotificationPermissionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -118,7 +118,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: () => _goToNextPage(context),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF4B4B4B),
+                    backgroundColor: const Color(0xFF4B4B4B).withOpacity(0.6),
                     foregroundColor: Colors.white,
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
@@ -138,17 +138,18 @@ class NotificationPermissionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Aktifkan notifikasi yuk',
+                'Aktifkan \n notifikasi yuk',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  height: 1.1,
                 ),
               ),
               const SizedBox(height: 12),
               const Text(
-                'Biar RunMates bisa ingetin kamu tentang lorem ipsum',
-                style: TextStyle(color: Colors.white70, fontSize: 17),
+                'Biar RunMates bisa ingetin kamu tentang latihan kamu',
+                style: TextStyle(color: Colors.black, fontSize: 17),
               ),
               const SizedBox(height: 40),
               NotificationCard(
@@ -173,7 +174,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () => _requestNotificationPermission(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan,
+                        backgroundColor: Color(0XFFFF5050),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),

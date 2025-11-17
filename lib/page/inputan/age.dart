@@ -21,7 +21,7 @@ class _AgePageState extends State<AgePage> {
     final screenWidth = media.size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0XFF1A1A1A),
+      backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -34,10 +34,9 @@ class _AgePageState extends State<AgePage> {
                   Text(
                     "Berapa usia kamu?",
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Outfit',
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -45,9 +44,8 @@ class _AgePageState extends State<AgePage> {
                     "Setiap usia punya kapasitas berbeda, kami sesuaikan latihan buat usia kamu",
                     textAlign: TextAlign.start,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 17,
-                      fontFamily: 'Outfit',
                     ),
                   ),
                 ],
@@ -61,7 +59,7 @@ class _AgePageState extends State<AgePage> {
                 Text(
                   "$_currentAge",
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 100,
                     fontWeight: FontWeight.bold,
                   ),
@@ -69,7 +67,7 @@ class _AgePageState extends State<AgePage> {
                 const SizedBox(height: 8),
                 const Icon(
                   Icons.arrow_drop_up,
-                  color: Colors.pinkAccent,
+                  color: Colors.black,
                   size: 50,
                 ),
                 const SizedBox(height: 16),
@@ -81,7 +79,7 @@ class _AgePageState extends State<AgePage> {
                     Container(
                       height: _barHeight,
                       width: double.infinity,
-                      color: Color(0XFF00F0FF),
+                      color: Color(0XFFFF5050),
                       child: Center(
                         child: NumberPicker(
                           value: _currentAge,
@@ -96,11 +94,11 @@ class _AgePageState extends State<AgePage> {
                             });
                           },
                           textStyle: TextStyle(
-                            color: Color(0XFFFF006E),
+                            color: Colors.white,
                             fontSize: 35,
                           ),
                           selectedTextStyle: const TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
@@ -155,7 +153,7 @@ class _AgePageState extends State<AgePage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
+                    backgroundColor: Color(0XFFFF5050),
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),

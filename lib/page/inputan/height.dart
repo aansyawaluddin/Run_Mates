@@ -39,7 +39,7 @@ class _HeightPageState extends State<HeightPage> {
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     return Scaffold(
-      backgroundColor: const Color(0XFF1A1A1A),
+      backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -54,7 +54,7 @@ class _HeightPageState extends State<HeightPage> {
                   const Text(
                     "Berapa tinggi badan kamu?",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
                     ),
@@ -63,7 +63,7 @@ class _HeightPageState extends State<HeightPage> {
                   const Text(
                     "Setiap usia punya kapasitas berbeda, kami sesuaikan latihan buat usia kamu",
                     textAlign: TextAlign.start,
-                    style: TextStyle(color: Colors.white70, fontSize: 17),
+                    style: TextStyle(color: Colors.black, fontSize: 17),
                   ),
                 ],
               ),
@@ -78,7 +78,7 @@ class _HeightPageState extends State<HeightPage> {
                       Text(
                         "$_currentHeight",
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 64,
                           fontWeight: FontWeight.bold,
                         ),
@@ -87,7 +87,7 @@ class _HeightPageState extends State<HeightPage> {
                       const Text(
                         "Cm",
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Colors.black,
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
                         ),
@@ -128,7 +128,7 @@ class _HeightPageState extends State<HeightPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan,
+                        backgroundColor: Color(0XFFFF5050),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
@@ -169,7 +169,7 @@ class _HeightPageState extends State<HeightPage> {
               width: 90,
               height: 300,
               decoration: BoxDecoration(
-                color: Color(0XFF00F0FF),
+                color: Color(0XFFFF5050),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -233,7 +233,7 @@ class _HeightPageState extends State<HeightPage> {
                   height: 6,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0XFFFF006E),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -247,7 +247,7 @@ class _HeightPageState extends State<HeightPage> {
               width: 18,
               height: 15,
               child: CustomPaint(
-                painter: TriangleLeftPainter(color: const Color(0XFFFF006E)),
+                painter: TriangleLeftPainter(color: Colors.black),
               ),
             ),
           ),
@@ -283,7 +283,7 @@ class _HeightPageState extends State<HeightPage> {
                 child: Text(
                   "$value",
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.white70,
+                    color: isSelected ? Colors.black : Colors.black,
                     fontSize: isSelected ? 18 : 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                   ),
@@ -299,7 +299,7 @@ class _HeightPageState extends State<HeightPage> {
 
 class TriangleLeftPainter extends CustomPainter {
   final Color color;
-  TriangleLeftPainter({this.color = const Color(0XFFFF006E)});
+  TriangleLeftPainter({this.color = Colors.white});
 
   @override
   void paint(Canvas canvas, Size size) {

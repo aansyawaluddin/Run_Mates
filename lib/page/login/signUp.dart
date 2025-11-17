@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Tidak lagi diperlukan jika hanya untuk Google
 import 'package:runmates/page/inputan/gender.dart';
 
 class SignUp extends StatelessWidget {
@@ -9,7 +9,7 @@ class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0XFF1A1A1A),
+      backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -17,7 +17,7 @@ class SignUp extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 60),
+                const SizedBox(height: 60),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -26,18 +26,18 @@ class SignUp extends StatelessWidget {
                       icon: Container(
                         padding: const EdgeInsets.all(3.0),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00F0FF),
+                          color: Color(0XFFFF5050),
                           shape: BoxShape.circle,
                         ),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: const BoxDecoration(
-                            color: Colors.black,
+                            color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.arrow_back,
-                            color: Color(0xFF00F0FF),
+                            color: Color(0XFFFF5050),
                             size: 24,
                           ),
                         ),
@@ -47,12 +47,13 @@ class SignUp extends StatelessWidget {
                     const SizedBox(width: 60),
                     Expanded(
                       child: Text(
-                        'Create an\n    account',
+                        'Create an\n    account',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.outfit().fontFamily,
+                          // Menggunakan font yang sama dengan desain jika Fugaz One diterapkan di sana
+                          fontFamily: GoogleFonts.fugazOne().fontFamily,
                         ),
                       ),
                     ),
@@ -67,12 +68,22 @@ class SignUp extends StatelessWidget {
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Email',
-                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    hintStyle: const TextStyle(color: Colors.black),
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 2.0,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 18.0,
@@ -97,16 +108,16 @@ class SignUp extends StatelessWidget {
                       );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0XFF00F0FF),
+                      backgroundColor: const Color(0XFFFF5050),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Join Us',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -118,27 +129,21 @@ class SignUp extends StatelessWidget {
                 // Divider OR
                 Row(
                   children: [
-                    Expanded(
-                      child: Divider(
-                        color: Colors.purple.shade200,
-                        thickness: 1,
-                      ),
+                    const Expanded(
+                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         'Or',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.black.withOpacity(0.8),
                           fontSize: 16,
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Divider(
-                        color: Colors.purple.shade200,
-                        thickness: 1,
-                      ),
+                    const Expanded(
+                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
                     ),
                   ],
                 ),
@@ -148,70 +153,73 @@ class SignUp extends StatelessWidget {
                 Center(
                   child: Text(
                     'sign up with',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ),
 
                 const SizedBox(height: 24.0),
 
-                // 🔹 Social Icons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.google,
-                      color: Colors.red,
-                      onTap: () {
-                        print('Sign up with Google');
-                      },
+                Center(
+                  child: Container(
+                    width: 250,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(
+                            0.5,
+                          ),
+                          spreadRadius: 1, 
+                          blurRadius: 7,
+                          offset: const Offset(0, 3), 
+                        ),
+                      ],
                     ),
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.apple,
-                      color: Colors.black,
-                      onTap: () {
-                        print('Sign up with Apple');
+                    child: OutlinedButton(
+                      onPressed: () {
+                        print('Sign up with Google (new button)');
                       },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.grey.shade400,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(80.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/google.png',
+                            height: 24.0,
+                            width: 24.0,
+                          ),
+                          const SizedBox(width: 12.0),
+                          const Text(
+                            'Sign in with Google',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildSocialIcon(
-                      icon: FontAwesomeIcons.facebook,
-                      color: Colors.blue.shade800,
-                      onTap: () {
-                        print('Sign up with Facebook');
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-
                 const SizedBox(height: 32.0),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialIcon({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 30),
         ),
       ),
     );

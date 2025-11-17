@@ -30,7 +30,7 @@ class _FinishScreenState extends State<FinishScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Color(0xFF121212),
+      backgroundColor: Color(0XFFFAFAFA),
       body: Stack(
         children: [
           /// confetti
@@ -44,7 +44,7 @@ class _FinishScreenState extends State<FinishScreen> {
               emissionFrequency: 0.04,
               numberOfParticles: 50,
               colors: const [
-                Color(0xFF22DDF2),
+                Color(0XFFFF5050),
                 Color(0xFF4B0082),
                 Color(0xFF00FF7F),
               ],
@@ -71,7 +71,7 @@ class _FinishScreenState extends State<FinishScreen> {
                           width: 85,
                           height: 85,
                           decoration: const BoxDecoration(
-                            color: Color(0xFF22DDF2),
+                            color: Color(0XFFFF5050),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -79,13 +79,13 @@ class _FinishScreenState extends State<FinishScreen> {
                               width: 50,
                               height: 50,
                               decoration: const BoxDecoration(
-                                color: Colors.black,
+                                color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
                                 child: Icon(
                                   Icons.check_rounded,
-                                  color: Color(0xFF22DDF2),
+                                  color: Color(0XFFFF5050),
                                   size: 42,
                                 ),
                               ),
@@ -100,7 +100,7 @@ class _FinishScreenState extends State<FinishScreen> {
                       'Yeay!\nSemua udah\nsiap!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 43,
                         fontWeight: FontWeight.bold,
                       ),
@@ -110,7 +110,7 @@ class _FinishScreenState extends State<FinishScreen> {
                     const Text(
                       'Kami udah personalisasi program latihan berdasarkan data kamu. Yuk mulai lari dan capai target kamu!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
 
                     const Spacer(),
@@ -126,17 +126,16 @@ class _FinishScreenState extends State<FinishScreen> {
                           height: 56,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) {
-                                    return const HomePage();
-                                  },
+                                  builder: (context) => const HomePage(),
                                 ),
+                                (Route<dynamic> route) => false,
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.cyan,
+                              backgroundColor: Color(0XFFFF5050),
                               foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(40),

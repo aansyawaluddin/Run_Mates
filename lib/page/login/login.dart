@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:runmates/page/login/signIn.dart';
 import 'package:runmates/page/login/signUp.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  final Color _primaryColor = const Color(0XFF00F0FF);
-  final Color _darkBackground = const Color(0XFF1A1A1A);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +11,7 @@ class LoginScreen extends StatelessWidget {
     final horizontalPadding = screenWidth * 0.10;
 
     return Scaffold(
-      backgroundColor: _darkBackground,
+      backgroundColor: Color(0XFFFAFAFA),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -32,21 +28,20 @@ class LoginScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: GoogleFonts.fugazOne().fontFamily,
+                      color: Colors.black,
                     ),
                   ),
                   Container(
                     width: 218,
                     height: 8,
-                    color: _primaryColor,
+                    color: Color(0XFFFF5050),
                     margin: const EdgeInsets.only(top: 4.0, bottom: 20.0),
                   ),
                   Text(
                     'Your Personal',
                     style: TextStyle(
                       fontSize: 32,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.black.withOpacity(0.8),
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -68,7 +63,7 @@ class LoginScreen extends StatelessWidget {
                       );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: _primaryColor,
+                      backgroundColor: Color(0XFFFF5050),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -76,7 +71,7 @@ class LoginScreen extends StatelessWidget {
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -100,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.transparent,
-                      side: BorderSide(color: _primaryColor, width: 2.0),
+                      side: BorderSide(color: Color(0XFFFF5050), width: 2.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -108,7 +103,7 @@ class LoginScreen extends StatelessWidget {
                     child: Text(
                       'Sign In',
                       style: TextStyle(
-                        color: _primaryColor,
+                        color: Color(0XFFFF5050),
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),

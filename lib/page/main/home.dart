@@ -32,19 +32,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color cyanAccent = Color(0XFF00DEEC);
-    const Color cardBackground = Color(0xFF2C2C2E);
+    const Color cyanAccent = Color(0XFFFF5050);
+    const Color cardBackground = Color(0XFFeeeded);
 
     return Scaffold(
-      backgroundColor: Color(0XFF1A1A1A),
+      backgroundColor: Color(0XFFFAFAFA),
       appBar: AppBar(
         title: Text(
           'Halo, Runners!',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.white,
-            fontFamily: GoogleFonts.fugazOne().fontFamily,
+            fontSize: 25,
+            color: Color(0XFFFF5050),
           ),
         ),
         automaticallyImplyLeading: false,
