@@ -40,6 +40,7 @@ flutter:
     - assets/images/running_tips.png
     - assets/logo.png
     - assets/google.png
+    - assets/images/detail.jpg
 
   fonts:
     - family: Outfit

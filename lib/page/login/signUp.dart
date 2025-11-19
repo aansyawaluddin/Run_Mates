@@ -52,8 +52,6 @@ class SignUp extends StatelessWidget {
                           color: Colors.black,
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
-                          // Menggunakan font yang sama dengan desain jika Fugaz One diterapkan di sana
-                          fontFamily: GoogleFonts.fugazOne().fontFamily,
                         ),
                       ),
                     ),

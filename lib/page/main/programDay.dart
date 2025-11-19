@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/page/main/detailProgram.dart';
 
 class ProgramDayPage extends StatelessWidget {
   final int weekNumber;
@@ -11,9 +12,9 @@ class ProgramDayPage extends StatelessWidget {
   });
 
   final List<Map<String, dynamic>> dailyWorkouts = const [
-    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': true},
-    {'day': 'Selasa', 'title': 'Short Train', 'isCompleted': true},
-    {'day': 'Rabu', 'title': 'Tempo Run', 'isCompleted': true},
+    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': false},
+    {'day': 'Selasa', 'title': 'Short Train', 'isCompleted': false},
+    {'day': 'Rabu', 'title': 'Tempo Run', 'isCompleted': false},
     {'day': 'Kamis', 'title': 'Interval Run', 'isCompleted': false},
     {'day': 'Jumat', 'title': 'Interval Run', 'isCompleted': false},
     {'day': 'Sabtu', 'title': 'Interval Run', 'isCompleted': false},
@@ -64,8 +65,8 @@ class ProgramDayPage extends StatelessWidget {
             title: workout['title'] as String,
             isCompleted: workout['isCompleted'] as bool,
             onTap: () {
-              print(
-                'Mulai latihan ${workout['title']} pada hari ${workout['day']} (Week $weekNumber)',
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProgramDetailPage()),
               );
             },
           );
@@ -83,7 +84,7 @@ class ProgramDayPage extends StatelessWidget {
     const Color primaryRed = Color(0xFFF44336);
 
     final Color cardColor = isCompleted ? primaryRed : Colors.white;
-    final Color textColor = isCompleted ? Colors.white : Colors.black;
+    final Color textColor = isCompleted ? Colors.white : primaryRed;
     final Border? border = isCompleted
         ? null
         : Border.all(color: primaryRed, width: 1.5);

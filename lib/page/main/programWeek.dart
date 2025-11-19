@@ -59,7 +59,6 @@ class ProgramWeekPage extends StatelessWidget {
                   onPressed: isEnabled
                       ? () {
                           final int selectedWeek = item['pekan'] as int;
-                          // kirim weekNumber dan totalWeeks ke ProgramDayPage
                           Navigator.push(
                             context,
                             MaterialPageRoute(

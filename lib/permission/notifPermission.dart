@@ -9,61 +9,17 @@ class NotificationPermissionScreen extends StatelessWidget {
 
   Future<void> _requestNotificationPermission(BuildContext context) async {
     try {
-      final status = await Permission.notification.status;
-
-      if (status.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Notifikasi sudah diizinkan')),
-        );
-        _goToNextPage(context);
-        return;
-      }
-
       final result = await Permission.notification.request();
 
       if (result.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Terima kasih — notifikasi diaktifkan')),
         );
+
+        await _showTestNotification(context);
+
         _goToNextPage(context);
       } else if (result.isPermanentlyDenied) {
-        final open = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Izinkan di Pengaturan'),
-            content: const Text(
-              'Kamu sudah menolak izin notifikasi. Buka pengaturan aplikasi untuk mengaktifkan notifikasi.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('Batal'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text('Buka Pengaturan'),
-              ),
-            ],
-          ),
-        );
-
-        if (open == true) {
-          await openAppSettings();
-
-          final newStatus = await Permission.notification.status;
-          if (newStatus.isGranted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Notifikasi diaktifkan lewat Pengaturan'),
-              ),
-            );
-            _goToNextPage(context);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Notifikasi masih belum diizinkan')),
-            );
-          }
-        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Izin notifikasi tidak diberikan')),
@@ -91,20 +47,17 @@ class NotificationPermissionScreen extends StatelessWidget {
       return;
     }
 
-    // panggil service untuk menampilkan notifikasi
     await NotifiService().showNotification(
-      100, // id
-      'Tes Notifikasi — RunMates',
-      'Ini adalah notifikasi test. Mantap!',
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notifikasi dikirim (cek tray)')),
+      100,
+      'RunMates',
+      'Program anda sudah dibuat',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
@@ -137,6 +90,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+
               const Text(
                 'Aktifkan \nnotifikasi yuk',
                 style: TextStyle(
@@ -146,33 +100,45 @@ class NotificationPermissionScreen extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
+
               const SizedBox(height: 12),
+
               const Text(
                 'Biar RunMates bisa ingetin kamu tentang latihan kamu',
                 style: TextStyle(color: Colors.black, fontSize: 17),
               ),
+
               const SizedBox(height: 40),
+
               NotificationCard(
                 title: 'Waktunya lari harian kamu',
                 description:
                     'Lari 30 menit aja udah cukup buat jaga kebugaran dan progress menuju target bulanan kamu',
               ),
+
               const SizedBox(height: 16),
+
               NotificationCard(
                 title: 'Tinggal 5 km lagi menuju target kamu!',
                 description:
                     'Lari sebentar hari ini bisa bantu kamu capai target bulanan kamu lho',
               ),
+
               const Spacer(),
-              // Tombol test + izin
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: screenWidth * 0.4,
+
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0,
+                    vertical: 24,
+                  ),
+                  child: SizedBox(
+                    width: screenWidth * 0.6,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () => _requestNotificationPermission(context),
+                      onPressed: () {
+                        _requestNotificationPermission(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0XFFFF5050),
                         foregroundColor: Colors.black,
@@ -182,42 +148,17 @@ class NotificationPermissionScreen extends StatelessWidget {
                         elevation: 6,
                       ),
                       child: const Text(
-                        "Izinkan Notifikasi",
+                        "Continue",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: screenWidth * 0.35,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () => _showTestNotification(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white24,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: const Text(
-                        "Tes Notifikasi",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 24),
             ],
           ),
         ),
