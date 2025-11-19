@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+
+class ProgramDayPage extends StatelessWidget {
+  final int weekNumber;
+  final int totalWeeks;
+
+  const ProgramDayPage({
+    super.key,
+    required this.weekNumber,
+    required this.totalWeeks,
+  });
+
+  final List<Map<String, dynamic>> dailyWorkouts = const [
+    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': true},
+    {'day': 'Selasa', 'title': 'Short Train', 'isCompleted': true},
+    {'day': 'Rabu', 'title': 'Tempo Run', 'isCompleted': true},
+    {'day': 'Kamis', 'title': 'Interval Run', 'isCompleted': false},
+    {'day': 'Jumat', 'title': 'Interval Run', 'isCompleted': false},
+    {'day': 'Sabtu', 'title': 'Interval Run', 'isCompleted': false},
+    {'day': 'Minggu', 'title': 'Interval Run', 'isCompleted': false},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    const Color primaryRed = Color(0XFFFF5050);
+
+    return Scaffold(
+      backgroundColor: Color(0XFFFAFAFA),
+      appBar: AppBar(
+        backgroundColor: Color(0XFFFAFAFA),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryRed),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'Pekan $weekNumber dari $totalWeeks',
+          style: const TextStyle(
+            color: primaryRed,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.notifications_none, color: primaryRed, size: 28),
+          ),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
+        ),
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        itemCount: dailyWorkouts.length,
+        itemBuilder: (context, index) {
+          final workout = dailyWorkouts[index];
+          return _buildWorkoutCard(
+            day: workout['day'] as String,
+            title: workout['title'] as String,
+            isCompleted: workout['isCompleted'] as bool,
+            onTap: () {
+              print(
+                'Mulai latihan ${workout['title']} pada hari ${workout['day']} (Week $weekNumber)',
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildWorkoutCard({
+    required String day,
+    required String title,
+    required bool isCompleted,
+    required VoidCallback onTap,
+  }) {
+    const Color primaryRed = Color(0xFFF44336);
+
+    final Color cardColor = isCompleted ? primaryRed : Colors.white;
+    final Color textColor = isCompleted ? Colors.white : Colors.black;
+    final Border? border = isCompleted
+        ? null
+        : Border.all(color: primaryRed, width: 1.5);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: GestureDetector(
+        onTap: isCompleted ? null : onTap,
+        child: Container(
+          height: 100,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(15),
+            border: border,
+            boxShadow: [
+              if (isCompleted)
+                BoxShadow(
+                  color: primaryRed.withOpacity(0.4),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    day,
+                    style: TextStyle(
+                      color: isCompleted ? Colors.white : primaryRed,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              if (isCompleted)
+                const Icon(Icons.check_circle, color: Colors.white, size: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

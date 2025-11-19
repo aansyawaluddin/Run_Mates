@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/home.dart';
-import 'package:runmates/page/main/home.dart';
 
 class SingIn extends StatefulWidget {
   const SingIn({super.key});
@@ -160,9 +159,12 @@ class _SingInState extends State<SingIn> {
                   height: 60,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const MainScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const MainScreen(),
+                        ),
+                        (Route<dynamic> route) => false,
                       );
 
                       debugPrint('Email: ${_emailController.text}');

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import 'package:runmates/page/main/home.dart';
+import 'package:runmates/home.dart';
 
 class FinishScreen extends StatefulWidget {
   const FinishScreen({super.key});
@@ -129,7 +129,7 @@ class _FinishScreenState extends State<FinishScreen> {
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HomePage(),
+                                  builder: (context) => const MainScreen(),
                                 ),
                                 (Route<dynamic> route) => false,
                               );

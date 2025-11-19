@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/page/main/programDay.dart';
 
-class ProgramPage extends StatelessWidget {
-  const ProgramPage({super.key});
+class ProgramWeekPage extends StatelessWidget {
+  const ProgramWeekPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +13,12 @@ class ProgramPage extends StatelessWidget {
       {'pekan': 4, 'color': const Color(0xFFF44336)},
     ];
 
+    final int totalWeeks = pekanList.length;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0XFFFAFAFA),
         title: const Text(
           'Program Latihan',
           style: TextStyle(
@@ -35,9 +38,12 @@ class ProgramPage extends StatelessWidget {
           ),
         ],
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
+        ),
       ),
       body: Container(
-        color: Colors.white,
+        color: const Color(0XFFFAFAFA),
         child: ListView.builder(
           padding: const EdgeInsets.all(16.0),
           itemCount: pekanList.length,
@@ -52,8 +58,20 @@ class ProgramPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: isEnabled
                       ? () {
-                          // Aksi saat tombol ditekan
-                          print('Tombol Pekan ${item['pekan']} ditekan');
+                          final int selectedWeek = item['pekan'] as int;
+                          // kirim weekNumber dan totalWeeks ke ProgramDayPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProgramDayPage(
+                                weekNumber: selectedWeek,
+                                totalWeeks: totalWeeks,
+                              ),
+                            ),
+                          );
+                          print(
+                            'Navigasi ke Week $selectedWeek dari $totalWeeks minggu',
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

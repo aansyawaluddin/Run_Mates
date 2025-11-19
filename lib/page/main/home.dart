@@ -66,6 +66,11 @@ class _HomePageState extends State<HomePage> {
         ],
         backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            color: Color(0XFFFAFAFA),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
