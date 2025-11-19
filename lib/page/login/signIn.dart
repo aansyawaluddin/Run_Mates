@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:runmates/home.dart';
 import 'package:runmates/page/main/home.dart';
 
 class SingIn extends StatefulWidget {
@@ -160,12 +160,11 @@ class _SingInState extends State<SingIn> {
                   height: 60,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const MainScreen()),
                       );
+
                       debugPrint('Email: ${_emailController.text}');
                       debugPrint('Password: ${_passwordController.text}');
                     },
@@ -198,10 +197,7 @@ class _SingInState extends State<SingIn> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         'Or',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
                     Expanded(

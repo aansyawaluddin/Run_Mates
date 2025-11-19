@@ -222,7 +222,7 @@ class _HeightPageState extends State<HeightPage> {
             ),
           ),
 
-          //garis merah
+          //garis
           Positioned(
             left: 0,
             child: SizedBox(
@@ -233,7 +233,7 @@ class _HeightPageState extends State<HeightPage> {
                   height: 6,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),

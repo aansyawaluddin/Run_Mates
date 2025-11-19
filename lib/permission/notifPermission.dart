@@ -138,7 +138,7 @@ class NotificationPermissionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Aktifkan \n notifikasi yuk',
+                'Aktifkan \nnotifikasi yuk',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 40,

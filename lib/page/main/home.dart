@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,8 +10,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
-  int _bottomNavIndex = 0;
 
   @override
   void initState() {
@@ -32,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color cyanAccent = Color(0XFFFF5050);
+    const Color RedColor = Color(0XFFFF5050);
     const Color cardBackground = Color(0XFFeeeded);
 
     return Scaffold(
@@ -62,7 +59,7 @@ class _HomePageState extends State<HomePage> {
               child: const Icon(
                 Icons.notifications_none_outlined,
                 size: 28,
-                color: cyanAccent,
+                color: RedColor,
               ),
             ),
           ),
@@ -107,43 +104,15 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
 
               // card program lari
-              _buildProgramCard(cardBackground, cyanAccent),
+              _buildProgramCard(cardBackground, RedColor),
               const SizedBox(height: 20),
 
               // card progress minggu ini
-              _buildWeeklyProgressCard(cardBackground, cyanAccent),
+              _buildWeeklyProgressCard(cardBackground, RedColor),
               const SizedBox(height: 20),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _bottomNavIndex,
-        onTap: (index) {
-          setState(() {
-            _bottomNavIndex = index;
-          });
-        },
-        backgroundColor: cyanAccent,
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Color(0XFF1A1A1A).withOpacity(0.8),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 30),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt_rounded, size: 30),
-            label: 'Program',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_rounded, size: 30),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }
@@ -152,17 +121,6 @@ class _HomePageState extends State<HomePage> {
   Widget tipsCardPage({required String imagePath, required String text}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Stack(
@@ -261,7 +219,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0XFFFF5050),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -273,7 +231,7 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'Latihan hari ini • Minggu 1, Hari 3',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -287,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Lihat detail',
                       style: TextStyle(
-                        color: Color(0XFF00DEEC),
+                        color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -306,7 +264,7 @@ class _HomePageState extends State<HomePage> {
           const Text(
             'INTERVAL RUN',
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -314,7 +272,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 4),
           Text(
             'Melatih daya tahan & kecepatan',
-            style: TextStyle(color: Colors.grey[800], fontSize: 14),
+            style: TextStyle(color: Colors.white, fontSize: 14),
           ),
         ],
       ),
@@ -322,7 +280,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card program lari
-  Widget _buildProgramCard(Color cardBackground, Color cyanAccent) {
+  Widget _buildProgramCard(Color cardBackground, Color RedColor) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -335,7 +293,7 @@ class _HomePageState extends State<HomePage> {
           const Text(
             'Program lari 20K',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -343,7 +301,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 4),
           Text(
             '12 Minggu • Target : 20K dalam 1 jam',
-            style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            style: TextStyle(color: Colors.black, fontSize: 12),
           ),
           const SizedBox(height: 16),
           Row(
@@ -351,12 +309,12 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 'Progress program',
-                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                style: TextStyle(color: Colors.black, fontSize: 12),
               ),
               const Text(
                 '25%',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -369,7 +327,7 @@ class _HomePageState extends State<HomePage> {
             child: LinearProgressIndicator(
               value: 0.25, // 25%
               backgroundColor: Colors.grey[800],
-              valueColor: AlwaysStoppedAnimation<Color>(cyanAccent),
+              valueColor: AlwaysStoppedAnimation<Color>(RedColor),
               minHeight: 10,
             ),
           ),
@@ -379,7 +337,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card progress minggu ini
-  Widget _buildWeeklyProgressCard(Color cardBackground, Color cyanAccent) {
+  Widget _buildWeeklyProgressCard(Color cardBackground, Color RedColor) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -392,7 +350,7 @@ class _HomePageState extends State<HomePage> {
           const Text(
             'Progress Minggu Ini',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -412,9 +370,9 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildDayIndicator('S', isDone: true, isCyan: true),
-              _buildDayIndicator('S', isDone: true, isCyan: true),
-              _buildDayIndicator('R', isDone: true, isCyan: true),
+              _buildDayIndicator('S', isDone: true, isRed: true),
+              _buildDayIndicator('S', isDone: true, isRed: true),
+              _buildDayIndicator('R', isDone: true, isRed: true),
               _buildDayIndicator('K'),
               _buildDayIndicator('J'),
               _buildDayIndicator('S'),
@@ -427,7 +385,7 @@ class _HomePageState extends State<HomePage> {
           // baris peningkatan
           Row(
             children: [
-              Icon(Icons.trending_up, color: cyanAccent, size: 20),
+              Icon(Icons.trending_up, color: RedColor, size: 20),
               const SizedBox(width: 8),
               const Expanded(
                 child: Column(
@@ -436,14 +394,14 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Peningkatan minggu ini',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     Text(
                       'Jarak lari meningkat 2KM dari minggu lalu',
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                      style: TextStyle(color: Colors.black, fontSize: 12),
                     ),
                   ],
                 ),
@@ -451,7 +409,7 @@ class _HomePageState extends State<HomePage> {
               const Text(
                 '+20%',
                 style: TextStyle(
-                  color: Color(0xFF34C759),
+                  color: Color(0XFFFF5050),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -469,7 +427,7 @@ class _HomePageState extends State<HomePage> {
       width: MediaQuery.of(context).size.width / 3.8,
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0XFFFF5050),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -477,13 +435,13 @@ class _HomePageState extends State<HomePage> {
           Text(
             value,
             style: const TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
-          Text(unit, style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+          Text(unit, style: TextStyle(color: Colors.white, fontSize: 14)),
         ],
       ),
     );
@@ -493,19 +451,19 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDayIndicator(
     String day, {
     bool isDone = false,
-    bool isCyan = false,
+    bool isRed = false,
   }) {
-    Color circleColor = Colors.grey[800]!;
+    Color circleColor = Colors.white;
     Widget child = Text(
       day,
       style: TextStyle(
-        color: isCyan ? const Color(0XFF00DEEC) : Colors.white,
+        color: isRed ? const Color(0XFFFF5050) : Color(0XFFFF5050),
         fontWeight: FontWeight.bold,
       ),
     );
 
     if (isDone) {
-      circleColor = const Color(0XFF00DEEC);
+      circleColor = const Color(0XFFFF5050);
       child = const Icon(Icons.check, color: Colors.white, size: 16);
     }
 

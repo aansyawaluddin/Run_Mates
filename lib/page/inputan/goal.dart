@@ -19,10 +19,10 @@ class _GoalsPageState extends State<GoalsPage> {
   late final FocusNode _minuteFocusNode;
   late final FocusNode _secondFocusNode;
 
-  static const Color kCyanColor = Color(0xFF00F0FF);
-  static const Color kBg = Color(0XFF1A1A1A);
-  static const Color kFill = Color(0xFF515151);
-  static const Color kEnabledBorder = Color(0xFF3A3A3A);
+  static const Color RedColor = Color(0XFFFF5050);
+  static const Color kBg = Color(0XFFFAFAFA);
+  static const Color kFill = Color(0XFFFAFAFA);
+  static const Color kEnabledBorder = Color(0XFFFAFAFA);
 
   @override
   void initState() {
@@ -66,7 +66,7 @@ class _GoalsPageState extends State<GoalsPage> {
               const Text(
                 "Yuk set target kamu!",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
                 ),
@@ -75,7 +75,7 @@ class _GoalsPageState extends State<GoalsPage> {
               const Text(
                 "Berapa KM yang mau kamu taklukkan dan dalam waktu berapa?",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 17,
                   fontWeight: FontWeight.normal,
                 ),
@@ -86,7 +86,7 @@ class _GoalsPageState extends State<GoalsPage> {
               const Text(
                 "Distance",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -94,9 +94,9 @@ class _GoalsPageState extends State<GoalsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: _distanceController,
-                cursorColor: kCyanColor,
+                cursorColor: RedColor,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
                 ),
@@ -105,7 +105,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 decoration: InputDecoration(
                   suffixText: "KM",
                   suffixStyle: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
@@ -120,7 +120,7 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: kCyanColor, width: 4.0),
+                    borderSide: const BorderSide(color: RedColor, width: 4.0),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 20,
@@ -134,7 +134,7 @@ class _GoalsPageState extends State<GoalsPage> {
               const Text(
                 "Time",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -150,7 +150,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 minuteFocus: _minuteFocusNode,
                 secondFocus: _secondFocusNode,
                 enabledBorderColor: kEnabledBorder,
-                focusedBorderColor: kCyanColor,
+                focusedBorderColor: RedColor,
                 fillColor: kFill,
               ),
 
@@ -175,7 +175,7 @@ class _GoalsPageState extends State<GoalsPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan,
+                        backgroundColor: Color(0XFFFF5050),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
@@ -270,8 +270,8 @@ class _TimeInputState extends State<_TimeInput> {
           const Text(
             "[",
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
+              color: Colors.black,
+              fontSize: 50,
               fontWeight: FontWeight.bold,
               height: 1,
             ),
@@ -288,7 +288,7 @@ class _TimeInputState extends State<_TimeInput> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   height: 1.0,
@@ -297,7 +297,7 @@ class _TimeInputState extends State<_TimeInput> {
                   counterText: "",
                   hintText: hint,
                   hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.black,
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
@@ -311,8 +311,8 @@ class _TimeInputState extends State<_TimeInput> {
           const Text(
             "]",
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
+              color: Colors.black,
+              fontSize: 50,
               fontWeight: FontWeight.bold,
               height: 1,
             ),
