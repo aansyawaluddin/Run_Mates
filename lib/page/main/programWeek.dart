@@ -7,10 +7,10 @@ class ProgramWeekPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> pekanList = [
-      {'pekan': 1, 'color': const Color(0xFFF44336)},
-      {'pekan': 2, 'color': const Color(0xFFF44336)},
-      {'pekan': 3, 'color': const Color(0xFFF44336)},
-      {'pekan': 4, 'color': const Color(0xFFF44336)},
+      {'pekan': 1, 'color': const Color(0XFFFF5050)},
+      {'pekan': 2, 'color': const Color(0XFFFF5050)},
+      {'pekan': 3, 'color': const Color(0XFFFF5050)},
+      {'pekan': 4, 'color': const Color(0XFFFF5050)},
     ];
 
     final int totalWeeks = pekanList.length;
@@ -22,7 +22,7 @@ class ProgramWeekPage extends StatelessWidget {
         title: const Text(
           'Program Latihan',
           style: TextStyle(
-            color: Color(0xFFF44336),
+            color: Color(0XFFFF5050),
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
@@ -32,7 +32,7 @@ class ProgramWeekPage extends StatelessWidget {
             padding: EdgeInsets.only(right: 16.0),
             child: Icon(
               Icons.notifications_none,
-              color: Color(0xFFF44336),
+              color: Color(0XFFFF5050),
               size: 28,
             ),
           ),
@@ -45,7 +45,7 @@ class ProgramWeekPage extends StatelessWidget {
       body: Container(
         color: const Color(0XFFFAFAFA),
         child: ListView.builder(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           itemCount: pekanList.length,
           itemBuilder: (context, index) {
             final item = pekanList[index];

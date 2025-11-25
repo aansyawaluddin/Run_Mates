@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: GestureDetector(
               onTap: () {
                 // Navigator.push(
@@ -67,9 +67,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Color(0XFFFAFAFA),
-          ),
+          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
         ),
       ),
       body: SingleChildScrollView(

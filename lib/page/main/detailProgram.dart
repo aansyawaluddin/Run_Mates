@@ -5,13 +5,13 @@ class ProgramDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryRed = Color(0xFFF44336);
+    const Color primaryRed = Color(0XFFFF5050);
     const Color darkGrey = Color(0xFF424242);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0XFFFAFAFA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0XFFFAFAFA),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryRed),
@@ -19,10 +19,7 @@ class ProgramDetailPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          '', // Judul AppBar kosong sesuai desain
-          style: TextStyle(color: primaryRed),
-        ),
+        title: const Text('', style: TextStyle(color: primaryRed)),
         centerTitle: true,
         actions: const [
           Padding(
@@ -30,26 +27,21 @@ class ProgramDetailPage extends StatelessWidget {
             child: Icon(Icons.notifications_none, color: primaryRed, size: 28),
           ),
         ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Bagian Gambar Header ---
+            const SizedBox(height: 10),
             Container(
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
@@ -60,17 +52,8 @@ class ProgramDetailPage extends StatelessWidget {
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey,
-                          child: const Center(
-                            child: Text(
-                              "Gambar Tidak Ditemukan",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        );
-                      },
+                      color: Colors.black.withOpacity(0.6),
+                      colorBlendMode: BlendMode.darken,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -84,27 +67,23 @@ class ProgramDetailPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
+                    Center(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
                             'EASY RUN',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 34,
+                              color: primaryRed,
+                              fontSize: 50,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.5,
                             ),
                           ),
                           Text(
                             'Daya Tahan Dasar',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                         ],
                       ),
@@ -115,16 +94,16 @@ class ProgramDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- Deskripsi Latihan ---
+            // Deskripsi
             Text(
               'Easy run adalah Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum. Ut pharetra orci vitae massa mattis ornare. Vivamus nec pulvinar magna. Integer et nisl gravida, mollis dui a, sagittis massa.',
               style: TextStyle(color: darkGrey, fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 25),
 
-            // --- Tujuan Latihan ---
+            // Tujuan
             _buildInfoSection(
-              icon: Icons.track_changes, // Ikon target
+              icon: Icons.track_changes,
               title: 'Tujuan Latihan',
               description:
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
@@ -132,18 +111,18 @@ class ProgramDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 25),
 
-            // --- Durasi Latihan ---
+            // Durasi
             _buildInfoSection(
-              icon: Icons.timer, // Ikon durasi
+              icon: Icons.timer,
               title: 'Durasi',
               description: '40 menit',
-              isDuration: true, // Untuk styling khusus durasi
+              isDuration: true,
               iconColor: primaryRed,
               durationColor: primaryRed,
             ),
             const SizedBox(height: 25),
 
-            // --- Langkah-langkah Latihan ---
+            // Langkah
             Text(
               'Langkah-langkah',
               style: TextStyle(
@@ -158,36 +137,32 @@ class ProgramDetailPage extends StatelessWidget {
               stepTitle: 'Pemanasan (5 Menit)',
               stepDescription:
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-              iconPath:
-                  'assets/icons/warmup_icon.png', // Ganti dengan path ikon pemanasan
+              iconPath: 'assets/icons/warmup_icon.png',
             ),
             _buildStepCard(
               stepNumber: 2,
               stepTitle: 'Lari (10 Menit)',
               stepDescription:
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-              iconPath:
-                  'assets/icons/run_icon.png', // Ganti dengan path ikon lari
+              iconPath: 'assets/icons/run_icon.png',
             ),
             _buildStepCard(
               stepNumber: 3,
               stepTitle: 'Pendinginan (10 Menit)',
               stepDescription:
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-              iconPath:
-                  'assets/icons/cooldown_icon.png', // Ganti dengan path ikon pendinginan
+              iconPath: 'assets/icons/cooldown_icon.png',
             ),
             const SizedBox(height: 30),
 
-            // --- Tombol Selesai ---
+            // Selesai
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
-                  // Aksi saat tombol selesai ditekan
                   print('Latihan selesai!');
-                  Navigator.pop(context); // Kembali atau ke halaman berikutnya
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryRed,
@@ -206,16 +181,14 @@ class ProgramDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ), // Tambahkan ruang di bagian bawah tombol
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  // Widget untuk bagian "Tujuan Latihan" dan "Durasi"
+  // Widget Tujuan Latihan dan Durasi
   Widget _buildInfoSection({
     required IconData icon,
     required String title,
@@ -258,7 +231,7 @@ class ProgramDetailPage extends StatelessWidget {
     );
   }
 
-  // Widget untuk setiap langkah latihan
+  // Widget langkah latihan
   Widget _buildStepCard({
     required int stepNumber,
     required String stepTitle,
@@ -273,7 +246,6 @@ class ProgramDetailPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Nomor Langkah
           Container(
             width: 25,
             height: 25,
@@ -314,20 +286,17 @@ class ProgramDetailPage extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 15),
-          // Ikon di sisi kanan
-          // Untuk menggunakan Image.asset, pastikan Anda memiliki gambar di folder 'assets/icons/'
-          // dan mendeklarasikannya di pubspec.yaml
           Image.asset(
             iconPath,
             width: 40,
             height: 40,
-            color: primaryRed, // Aplikasikan warna merah ke ikon
+            color: primaryRed,
             errorBuilder: (context, error, stackTrace) {
               return const Icon(
                 Icons.fitness_center,
                 color: primaryRed,
                 size: 40,
-              ); // Ikon fallback
+              );
             },
           ),
         ],

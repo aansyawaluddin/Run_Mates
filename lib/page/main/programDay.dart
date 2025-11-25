@@ -26,56 +26,106 @@ class ProgramDayPage extends StatelessWidget {
     const Color primaryRed = Color(0XFFFF5050);
 
     return Scaffold(
-      backgroundColor: Color(0XFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Color(0XFFFAFAFA),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryRed),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+      backgroundColor: const Color(0XFFFAFAFA),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 18.0,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(3.0),
+                      decoration: const BoxDecoration(
+                        color: primaryRed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(1.0),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: primaryRed,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 60),
+
+                  Expanded(
+                    child: Text(
+                      'Pekan $weekNumber dari $totalWeeks',
+                      style: const TextStyle(
+                        color: primaryRed,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: aksi ketika tap notifikasi
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(right: 4.0),
+                      child: Icon(
+                        Icons.notifications_none,
+                        color: primaryRed,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // List latihan
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 8.0,
+                ),
+                itemCount: dailyWorkouts.length,
+                itemBuilder: (context, index) {
+                  final workout = dailyWorkouts[index];
+                  return _buildWorkoutCard(
+                    context: context,
+                    day: workout['day'] as String,
+                    title: workout['title'] as String,
+                    isCompleted: workout['isCompleted'] as bool,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ProgramDetailPage(),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          'Pekan $weekNumber dari $totalWeeks',
-          style: const TextStyle(
-            color: primaryRed,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.notifications_none, color: primaryRed, size: 28),
-          ),
-        ],
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
-        ),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        itemCount: dailyWorkouts.length,
-        itemBuilder: (context, index) {
-          final workout = dailyWorkouts[index];
-          return _buildWorkoutCard(
-            day: workout['day'] as String,
-            title: workout['title'] as String,
-            isCompleted: workout['isCompleted'] as bool,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ProgramDetailPage()),
-              );
-            },
-          );
-        },
       ),
     );
   }
 
   Widget _buildWorkoutCard({
+    required BuildContext context,
     required String day,
     required String title,
     required bool isCompleted,

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Tidak lagi diperlukan jika hanya untuk Google
 import 'package:runmates/page/inputan/gender.dart';
 
 class SignUp extends StatelessWidget {
