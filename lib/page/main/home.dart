@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     const Color RedColor = Color(0XFFFF5050);
     const Color cardBackground = Color(0XFFeeeded);
+    final double bottomSpacing = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: Color(0XFFFAFAFA),
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, bottomSpacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[

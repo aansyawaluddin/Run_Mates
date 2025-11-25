@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/component/navbar.dart';
 import 'package:runmates/page/main/home.dart';
+import 'package:runmates/page/main/profile.dart';
 import 'package:runmates/page/main/programWeek.dart';
 
 class MainScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = const [
     HomePage(),
     ProgramWeekPage(),
+    ProfilePage(),
   ];
 
   @override
@@ -41,6 +43,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,

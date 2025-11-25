@@ -17,21 +17,21 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 5),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15), // Shadow lebih halus
+            blurRadius: 20,
+            spreadRadius: 5,
+            offset: const Offset(0, 5),
+          ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
+        borderRadius: BorderRadius.circular(30),
         child: BottomNavigationBar(
           currentIndex: currentIndex,
           type: BottomNavigationBarType.fixed,
@@ -41,13 +41,15 @@ class CustomBottomNav extends StatelessWidget {
           selectedItemColor: selectedColor,
           unselectedItemColor: const Color(0XFF1A1A1A).withOpacity(0.5),
           onTap: onTap,
+          elevation: 0,
           items: [
             BottomNavigationBarItem(
               icon: Icon(
-                Icons.home,
+                Icons.home_outlined,
                 size: 30,
                 color: currentIndex == 0 ? selectedColor : null,
               ),
+              activeIcon: Icon(Icons.home, size: 30, color: selectedColor),
               label: 'Home',
             ),
             BottomNavigationBarItem(
@@ -64,6 +66,7 @@ class CustomBottomNav extends StatelessWidget {
                 size: 30,
                 color: currentIndex == 2 ? selectedColor : null,
               ),
+              activeIcon: Icon(Icons.person, size: 30, color: selectedColor),
               label: 'Profile',
             ),
           ],

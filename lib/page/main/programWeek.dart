@@ -14,6 +14,7 @@ class ProgramWeekPage extends StatelessWidget {
     ];
 
     final int totalWeeks = pekanList.length;
+    final double bottomSpacing = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +46,7 @@ class ProgramWeekPage extends StatelessWidget {
       body: Container(
         color: const Color(0XFFFAFAFA),
         child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, bottomSpacing),
           itemCount: pekanList.length,
           itemBuilder: (context, index) {
             final item = pekanList[index];
