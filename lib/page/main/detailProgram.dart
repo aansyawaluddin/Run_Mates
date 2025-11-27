@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/component/bagde.dart';
 
 class ProgramDetailPage extends StatelessWidget {
   const ProgramDetailPage({super.key});
@@ -162,7 +163,7 @@ class ProgramDetailPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   print('Latihan selesai!');
-                  Navigator.pop(context);
+                  showBadgeUnlockPopup(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryRed,

@@ -55,10 +55,10 @@ class _SingInState extends State<SingIn> {
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    const SizedBox(width: 60),
+                    const SizedBox(width: 100),
                     Expanded(
                       child: Text(
-                        'Welcome \n runners !',
+                        'Welcome\nrunners !',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 40,

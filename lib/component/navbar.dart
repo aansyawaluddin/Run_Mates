@@ -17,13 +17,14 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 66,
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15), // Shadow lebih halus
+            color: Colors.black.withOpacity(0.15),
             blurRadius: 20,
             spreadRadius: 5,
             offset: const Offset(0, 5),
@@ -38,35 +39,52 @@ class CustomBottomNav extends StatelessWidget {
           backgroundColor: backgroundColor,
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          selectedFontSize: 0,
+          unselectedFontSize: 0,
           selectedItemColor: selectedColor,
           unselectedItemColor: const Color(0XFF1A1A1A).withOpacity(0.5),
           onTap: onTap,
           elevation: 0,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home_outlined,
-                size: 30,
-                color: currentIndex == 0 ? selectedColor : null,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Icon(
+                  Icons.home_outlined,
+                  size: 30,
+                  color: currentIndex == 0 ? selectedColor : null,
+                ),
               ),
-              activeIcon: Icon(Icons.home, size: 30, color: selectedColor),
+              activeIcon: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Icon(Icons.home, size: 30, color: selectedColor),
+              ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.list_alt_rounded,
-                size: 30,
-                color: currentIndex == 1 ? selectedColor : null,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Icon(
+                  Icons.list_alt_rounded,
+                  size: 30,
+                  color: currentIndex == 1 ? selectedColor : null,
+                ),
               ),
               label: 'Program',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person_outline_rounded,
-                size: 30,
-                color: currentIndex == 2 ? selectedColor : null,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Icon(
+                  Icons.person_outline_rounded,
+                  size: 30,
+                  color: currentIndex == 2 ? selectedColor : null,
+                ),
               ),
-              activeIcon: Icon(Icons.person, size: 30, color: selectedColor),
+              activeIcon: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Icon(Icons.person, size: 30, color: selectedColor),
+              ),
               label: 'Profile',
             ),
           ],

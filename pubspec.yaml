@@ -41,6 +41,7 @@ flutter:
     - assets/logo.png
     - assets/google.png
     - assets/images/detail.jpg
+    - assets/images/bagde.png
 
   fonts:
     - family: Outfit
