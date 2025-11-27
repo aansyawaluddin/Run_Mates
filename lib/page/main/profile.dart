@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/page/login/login.dart';
+import 'package:runmates/page/main/editProfile.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -77,7 +79,12 @@ class ProfilePage extends StatelessWidget {
                 text: "Profile",
                 color: primaryColor,
                 onTap: () {
-                  // TODO: navigasi ke halaman profile
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfilePage(),
+                    ),
+                  );
                 },
               ),
               _buildMenuItem(
@@ -94,7 +101,7 @@ class ProfilePage extends StatelessWidget {
                 color: primaryColor,
                 isLogout: true,
                 onTap: () {
-                  // TODO: aksi logout
+                  _showLogoutConfirmation(context, primaryColor);
                 },
               ),
 
@@ -126,10 +133,101 @@ class ProfilePage extends StatelessWidget {
                   _buildBadgePlaceholder("FINISH", "RUN", primaryColor),
                 ],
               ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // Modal Logout
+  void _showLogoutConfirmation(BuildContext context, Color primaryColor) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Are you sure you want to\nlog out?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0XFFFF5050),
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        side: BorderSide(color: primaryColor, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        "Yes, logout",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -188,7 +286,6 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 20),
-            // Text
             Text(
               text,
               style: const TextStyle(
@@ -198,13 +295,14 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const Spacer(),
+            if (!isLogout) const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
       ),
     );
   }
 
-  // Widget  Badge
+  // Widget Badge
   Widget _buildBadgePlaceholder(String topText, String mainText, Color color) {
     return Container(
       width: 100,
