@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/inputan/weight.dart';
+import 'package:runmates/features/input/weight.dart';
 
 class HeightPage extends StatefulWidget {
   const HeightPage({super.key});

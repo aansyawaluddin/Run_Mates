@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:runmates/page/inputan/age.dart';
+import 'package:runmates/features/input/age.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   const GenderSelectionPage({super.key});

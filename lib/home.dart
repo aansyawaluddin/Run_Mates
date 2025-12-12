@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/component/navbar.dart';
-import 'package:runmates/page/main/home.dart';
-import 'package:runmates/page/main/profile.dart';
-import 'package:runmates/page/main/programWeek.dart';
+import 'package:runmates/features/main/home.dart';
+import 'package:runmates/features/main/profile.dart';
+import 'package:runmates/features/main/programWeek.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

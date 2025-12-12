@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/login/login.dart';
+import 'package:runmates/features/auth/login.dart';
 import 'package:runmates/service/notifService.dart';
 
 

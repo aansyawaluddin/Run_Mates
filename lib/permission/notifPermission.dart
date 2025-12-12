@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:runmates/component/notifikasi.dart';
-import 'package:runmates/page/inputan/finish.dart';
+import 'package:runmates/features/input/finish.dart';
 import 'package:runmates/service/notifService.dart';
 
 class NotificationPermissionScreen extends StatelessWidget {

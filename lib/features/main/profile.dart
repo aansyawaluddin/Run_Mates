@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/login/login.dart';
-import 'package:runmates/page/main/editProfile.dart';
+import 'package:runmates/features/auth/login.dart';
+import 'package:runmates/features/main/editProfile.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

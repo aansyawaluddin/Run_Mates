@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:runmates/page/inputan/schedule.dart';
+import 'package:runmates/features/input/schedule.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({super.key});

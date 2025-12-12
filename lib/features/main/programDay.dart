@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/main/detailProgram.dart';
+import 'package:runmates/features/main/detailProgram.dart';
 
 class ProgramDayPage extends StatelessWidget {
   final int weekNumber;

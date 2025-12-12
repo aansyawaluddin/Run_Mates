@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:runmates/page/inputan/height.dart';
+import 'package:runmates/features/input/height.dart';
 
 class AgePage extends StatefulWidget {
   const AgePage({super.key});

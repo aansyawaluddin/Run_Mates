@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/main/programDay.dart';
+import 'package:runmates/features/main/programDay.dart';
 
 class ProgramWeekPage extends StatelessWidget {
   const ProgramWeekPage({super.key});

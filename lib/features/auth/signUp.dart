@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/inputan/gender.dart';
+import 'package:runmates/features/input/gender.dart';
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});

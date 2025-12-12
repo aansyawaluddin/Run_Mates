@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/login/signIn.dart';
-import 'package:runmates/page/login/signUp.dart';
+import 'package:runmates/features/auth/signIn.dart';
+import 'package:runmates/features/auth/signUp.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

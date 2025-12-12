@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/page/inputan/goal.dart';
+import 'package:runmates/features/input/goal.dart';
 
 class WeightScreen extends StatefulWidget {
   const WeightScreen({super.key});

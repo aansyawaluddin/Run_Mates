@@ -35,13 +35,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/male.png
-    - assets/images/female.png
-    - assets/images/running_tips.png
-    - assets/logo.png
-    - assets/google.png
-    - assets/images/detail.jpg
-    - assets/images/bagde.png
+    - assets/
 
   fonts:
     - family: Outfit
