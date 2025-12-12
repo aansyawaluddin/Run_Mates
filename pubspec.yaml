@@ -19,6 +19,7 @@ dependencies:
   confetti: ^0.8.0
   flutter_local_notifications: ^19.5.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -36,6 +37,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/images/
 
   fonts:
     - family: Outfit

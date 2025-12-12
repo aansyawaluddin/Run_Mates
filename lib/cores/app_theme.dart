@@ -3,14 +3,12 @@ import 'app_colors.dart';
 import 'app_text_styles.dart';
 
 class AppTheme {
-  // Tema Terang (Light Mode)
+  // TEMA TERANG (LIGHT MODE)
   static ThemeData get lightTheme {
     return ThemeData(
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.bgLight,
-      fontFamily: 'Swift',
-
-      // Mengatur Color Scheme modern
+      fontFamily: 'Outfit',
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         onPrimary: Colors.white,
@@ -20,37 +18,37 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
       ),
 
-      // Mengatur Text Theme Global
-      textTheme: const TextTheme(
-        displayLarge: AppTextStyles.display1,
-        headlineLarge: AppTextStyles.heading1,
-        headlineMedium: AppTextStyles.heading2,
-        headlineSmall: AppTextStyles.heading3,
-        titleMedium: AppTextStyles.heading4,
-        bodyLarge: AppTextStyles.paragraph1,
+      textTheme: TextTheme(
+        displayLarge: AppTextStyles.display1(),
+        headlineLarge: AppTextStyles.heading1(),
+        headlineMedium: AppTextStyles.heading2(),
+        headlineSmall: AppTextStyles.heading3(),
+        titleMedium: AppTextStyles.heading4(),
+        titleSmall: AppTextStyles.heading4Uppercase(),
+        bodyLarge: AppTextStyles.paragraph1(),
+        labelLarge: AppTextStyles.button(),
       ),
 
-      // Mengatur gaya Button default
+      // Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          textStyle: AppTextStyles.button,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8), // Asumsi radius
-          ),
+          textStyle: AppTextStyles.button(),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );
   }
 
-  // Tema Gelap (Dark Mode)
+  // TEMA GELAP (DARK MODE)
   static ThemeData get darkTheme {
     return ThemeData(
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.bgDark,
-      fontFamily: 'Swift',
+      fontFamily: 'Outfit',
 
+      // Color Scheme Dark
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         onPrimary: Colors.white,
@@ -60,11 +58,27 @@ class AppTheme {
         onSurface: AppColors.textSecondary,
       ),
 
-      // Sesuaikan warna teks menjadi putih untuk dark mode
-      textTheme: const TextTheme(
-        displayLarge: AppTextStyles
-            .display1, // Perlu override warna ke putih manual jika mau
-        bodyLarge: TextStyle(color: AppColors.textSecondary),
+      textTheme: TextTheme(
+        displayLarge: AppTextStyles.display1(color: AppColors.textSecondary),
+        headlineLarge: AppTextStyles.heading1(color: AppColors.textSecondary),
+        headlineMedium: AppTextStyles.heading2(color: AppColors.textSecondary),
+        headlineSmall: AppTextStyles.heading3(color: AppColors.textSecondary),
+        titleMedium: AppTextStyles.heading4(color: AppColors.textSecondary),
+        titleSmall: AppTextStyles.heading4Uppercase(
+          color: AppColors.textSecondary,
+        ),
+        bodyLarge: AppTextStyles.paragraph1(color: AppColors.textSecondary),
+        labelLarge: AppTextStyles.button(color: Colors.white),
+      ),
+
+      // Button Theme
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          textStyle: AppTextStyles.button(),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
       ),
     );
   }

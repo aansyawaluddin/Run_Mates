@@ -2,75 +2,58 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static const String fontFamily = 'Swift';
+  static const String fontFamily = 'Outfit';
 
-  // Display
-  static const TextStyle display1 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 54,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle _baseStyle(
+    double size,
+    FontWeight weight,
+    Color color, {
+    double? height,
+    double? letterSpacing,
+    TextDecoration? decoration,
+  }) {
+    return TextStyle(
+      fontFamily: fontFamily,
+      fontSize: size,
+      fontWeight: weight,
+      color: color,
+      height: height,
+      letterSpacing: letterSpacing,
+      decoration: decoration,
+    );
+  }
+
+  static TextStyle display1({Color color = AppColors.textPrimary}) =>
+      _baseStyle(64, FontWeight.bold, color);
 
   // Headings
-  static const TextStyle heading1 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 30,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle heading1({Color color = AppColors.textPrimary}) =>
+      _baseStyle(56, FontWeight.bold, color);
 
-  static const TextStyle heading2 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle heading2({Color color = AppColors.textPrimary}) =>
+      _baseStyle(48, FontWeight.bold, color);
 
-  static const TextStyle heading3 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle heading3({Color color = AppColors.textPrimary}) =>
+      _baseStyle(32, FontWeight.bold, color);
 
-  static const TextStyle heading4 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle heading4({Color color = AppColors.textPrimary}) =>
+      _baseStyle(24, FontWeight.bold, color);
 
-  static const TextStyle heading4Uppercase = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    letterSpacing: 1.0, // Uppercase biasanya butuh sedikit spacing
-    color: AppColors.textPrimary,
-  );
+  static TextStyle heading4Uppercase({Color color = AppColors.textPrimary}) =>
+      _baseStyle(14, FontWeight.bold, color, letterSpacing: 1.0);
 
   // Paragraph
-  static const TextStyle paragraph1 = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.normal, // Regular
-    color: AppColors.textPrimary,
-    height: 1.5, // Good for readability
-  );
+  static TextStyle paragraph1({Color color = AppColors.textPrimary}) =>
+      _baseStyle(15, FontWeight.normal, color, height: 1.5);
 
   // Components
-  static const TextStyle button = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: Colors.white, // Asumsi teks tombol putih di atas primary red
-  );
+  static TextStyle button({Color color = Colors.white}) =>
+      _baseStyle(16, FontWeight.bold, color);
 
-  static const TextStyle hyperlink = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w600, // SemiBold
-    color: AppColors.textLink,
+  static TextStyle hyperlink({Color color = AppColors.textLink}) => _baseStyle(
+    16,
+    FontWeight.w600,
+    color,
     decoration: TextDecoration.underline,
   );
 }
