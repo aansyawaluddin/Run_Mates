@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/auth/signIn.dart';
 import 'package:runmates/features/auth/signUp.dart';
 
@@ -11,7 +13,7 @@ class LoginScreen extends StatelessWidget {
     final horizontalPadding = screenWidth * 0.10;
 
     return Scaffold(
-      backgroundColor: Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -25,24 +27,22 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Text(
                     'RunMates',
-                    style: TextStyle(
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                    style: AppTextStyles.display1(
+                      weight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   Container(
                     width: 218,
                     height: 8,
-                    color: Color(0XFFFF5050),
+                    color: AppColors.primary,
                     margin: const EdgeInsets.only(top: 4.0, bottom: 20.0),
                   ),
                   Text(
-                    'Your Personal',
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.black.withOpacity(0.8),
-                      fontWeight: FontWeight.normal,
+                    'Your Personal Running Coach',
+                    style: AppTextStyles.heading4(
+                      weight: FontWeight.normal,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -63,17 +63,16 @@ class LoginScreen extends StatelessWidget {
                       );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0XFFFF5050),
+                      backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    child: Text(
+                      'Daftar',
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -95,17 +94,16 @@ class LoginScreen extends StatelessWidget {
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.transparent,
-                      side: BorderSide(color: Color(0XFFFF5050), width: 2.0),
+                      side: BorderSide(color: AppColors.primary, width: 2.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: Color(0XFFFF5050),
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      'Masuk',
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),

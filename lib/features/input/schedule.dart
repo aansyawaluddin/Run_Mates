@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/permission/notifPermission.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -21,10 +23,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     'Minggu',
   ];
 
-  final Color _activeColor = const Color(0XFFFF5050);
-  final Color _inactiveColor = const Color(0XFFFAFAFA);
-  final Color _backgroundColor = const Color(0XFFFAFAFA);
-
   // tombol hari ditekan
   void _toggleDay(String day) {
     setState(() {
@@ -41,38 +39,38 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final width = MediaQuery.of(context).size.width;
     final screenWidth = width;
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.only(right: 24.0, left: 24.0, top: 35.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 30),
-                const Text(
+                Text(
                   'Hari apa aja kamu ada waktu luang?',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    height: 0.9,
+                  style: AppTextStyles.heading3(
+                    weight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Kami tau kamu sibuk, pilih hari yang realistis buat kamu latihan',
-                  style: TextStyle(color: Colors.black, fontSize: 17),
+                  style: AppTextStyles.paragraph1(
+                    weight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 16),
 
                 // Pilih hari
-                const Text(
+                Text(
                   'Pilih hari',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.heading4(
+                    weight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -115,19 +113,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0XFFFF5050),
-                          foregroundColor: Colors.black,
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.textPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40),
                           ),
                           elevation: 6,
                         ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        child: Text(
+                          'Lanjutkan',
+                          style: AppTextStyles.paragraph1(
+                            weight: FontWeight.bold,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -146,8 +143,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget _buildDayButton(String day) {
     final bool isSelected = _selectedDays.contains(day);
 
-    final Color containerBgColor = isSelected ? _activeColor : _inactiveColor;
-    final Color textColor = isSelected ? _inactiveColor : _activeColor;
+    final Color containerBgColor = isSelected
+        ? AppColors.primary
+        : AppColors.textSecondary;
+    final Color textColor = isSelected
+        ? AppColors.textSecondary
+        : AppColors.primary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -159,15 +160,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           decoration: BoxDecoration(
             color: containerBgColor,
             borderRadius: BorderRadius.circular(15.0),
-            border: Border.all(color: _activeColor, width: 2.5),
+            border: Border.all(color: AppColors.primary, width: 2.5),
           ),
           child: Text(
             day,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
               color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/schedule.dart';
 
 class GoalsPage extends StatefulWidget {
@@ -18,11 +20,6 @@ class _GoalsPageState extends State<GoalsPage> {
   late final FocusNode _hourFocusNode;
   late final FocusNode _minuteFocusNode;
   late final FocusNode _secondFocusNode;
-
-  static const Color RedColor = Color(0XFFFF5050);
-  static const Color kBg = Color(0XFFFAFAFA);
-  static const Color kFill = Color(0XFFFAFAFA);
-  static const Color kEnabledBorder = Color(0XFFFAFAFA);
 
   @override
   void initState() {
@@ -55,93 +52,91 @@ class _GoalsPageState extends State<GoalsPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: kBg,
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.only(right: 24.0, left: 24.0, top: 35.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
-              const Text(
+              Text(
                 "Yuk set target kamu!",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.heading3(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Berapa KM yang mau kamu taklukkan dan dalam waktu berapa?",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 17,
-                  fontWeight: FontWeight.normal,
+                style: AppTextStyles.paragraph1(
+                  weight: FontWeight.w500,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 60),
 
               // Distance
-              const Text(
-                "Distance",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              Text(
+                "Jarak",
+                style: AppTextStyles.heading4(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
+
               TextField(
                 controller: _distanceController,
-                cursorColor: RedColor,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
+                cursorColor: AppColors.primary,
+                style: AppTextStyles.heading3(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
                   suffixText: "KM",
-                  suffixStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
+                  suffixStyle: AppTextStyles.heading4(
+                    weight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                   filled: true,
-                  fillColor: kFill,
+                  fillColor: AppColors.textSecondary,
+
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: kEnabledBorder,
-                      width: 1.2,
+                      color: AppColors.primary,
+                      width: 2.0,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: RedColor, width: 4.0),
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 4.0,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 20,
-                    horizontal: 16,
+                    horizontal: 24,
                   ),
                 ),
               ),
               const SizedBox(height: 32),
 
               // Time
-              const Text(
-                "Time",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              Text(
+                "Waktu",
+                style: AppTextStyles.heading4(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
 
-              // Time input
               _TimeInput(
                 hourController: _hourController,
                 minuteController: _minuteController,
@@ -149,13 +144,11 @@ class _GoalsPageState extends State<GoalsPage> {
                 hourFocus: _hourFocusNode,
                 minuteFocus: _minuteFocusNode,
                 secondFocus: _secondFocusNode,
-                enabledBorderColor: kEnabledBorder,
-                focusedBorderColor: RedColor,
-                fillColor: kFill,
               ),
 
               const SizedBox(height: 160),
 
+              // Button
               Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -175,19 +168,18 @@ class _GoalsPageState extends State<GoalsPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0XFFFF5050),
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
                         ),
                         elevation: 6,
                       ),
-                      child: const Text(
-                        "Continue",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: Text(
+                        'Lanjutkan',
+                        style: AppTextStyles.paragraph1(
+                          weight: FontWeight.bold,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -202,8 +194,8 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 }
 
-/// Widget input waktu dengan 3 TextField: jam, menit, detik
-class _TimeInput extends StatefulWidget {
+/// Widget input waktu yang sudah disesuaikan stylenya
+class _TimeInput extends StatelessWidget {
   const _TimeInput({
     required this.hourController,
     required this.minuteController,
@@ -211,9 +203,6 @@ class _TimeInput extends StatefulWidget {
     required this.hourFocus,
     required this.minuteFocus,
     required this.secondFocus,
-    required this.enabledBorderColor,
-    required this.focusedBorderColor,
-    required this.fillColor,
   });
 
   final TextEditingController hourController;
@@ -224,139 +213,74 @@ class _TimeInput extends StatefulWidget {
   final FocusNode minuteFocus;
   final FocusNode secondFocus;
 
-  final Color enabledBorderColor;
-  final Color focusedBorderColor;
-  final Color fillColor;
-
-  @override
-  State<_TimeInput> createState() => _TimeInputState();
-}
-
-class _TimeInputState extends State<_TimeInput> {
-  bool get _isAnyFocused =>
-      widget.hourFocus.hasFocus ||
-      widget.minuteFocus.hasFocus ||
-      widget.secondFocus.hasFocus;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.hourFocus.addListener(_onFocus);
-    widget.minuteFocus.addListener(_onFocus);
-    widget.secondFocus.addListener(_onFocus);
-  }
-
-  void _onFocus() => setState(() {});
-
-  @override
-  void dispose() {
-    widget.hourFocus.removeListener(_onFocus);
-    widget.minuteFocus.removeListener(_onFocus);
-    widget.secondFocus.removeListener(_onFocus);
-    super.dispose();
-  }
-
   Widget _bracketBox(
     TextEditingController controller,
     String hint,
     FocusNode focus,
   ) {
-    return SizedBox(
-      width: 80,
-      height: 70,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            "[",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 50,
-              fontWeight: FontWeight.bold,
-              height: 1,
+    final commonStyle = AppTextStyles.heading2(
+      weight: FontWeight.bold,
+      color: AppColors.textPrimary,
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text("[ ", style: commonStyle),
+        SizedBox(
+          width: 50,
+          child: TextField(
+            controller: controller,
+            focusNode: focus,
+            cursorColor: AppColors.primary,
+            textAlign: TextAlign.center,
+            maxLength: 2,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: AppTextStyles.heading3(
+              weight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Center(
-              child: TextField(
-                controller: controller,
-                focusNode: focus,
-                cursorColor: widget.focusedBorderColor,
-                textAlign: TextAlign.center,
-                maxLength: 2,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  height: 1.0,
-                ),
-                decoration: InputDecoration(
-                  counterText: "",
-                  hintText: hint,
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.only(bottom: 4),
-                ),
+            decoration: InputDecoration(
+              counterText: "",
+              hintText: hint,
+              hintStyle: commonStyle.copyWith(
+                color: AppColors.textPrimary.withOpacity(0.3),
               ),
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
-          const Text(
-            "]",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 50,
-              fontWeight: FontWeight.bold,
-              height: 1,
-            ),
-          ),
-        ],
-      ),
+        ),
+        Text(" ]", style: commonStyle),
+      ],
     );
   }
 
   Widget _colon() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 10),
+    padding: const EdgeInsets.symmetric(horizontal: 5),
     child: Text(
       ":",
-      style: TextStyle(
-        color: Colors.white.withOpacity(0.7),
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
+      style: AppTextStyles.heading2(
+        weight: FontWeight.bold,
+        color: AppColors.textPrimary, 
       ),
     ),
   );
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: widget.fillColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _isAnyFocused
-              ? widget.focusedBorderColor
-              : widget.enabledBorderColor,
-          width: _isAnyFocused ? 4.0 : 1.2,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _bracketBox(widget.hourController, "00", widget.hourFocus),
-          _colon(),
-          _bracketBox(widget.minuteController, "00", widget.minuteFocus),
-          _colon(),
-          _bracketBox(widget.secondController, "00", widget.secondFocus),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _bracketBox(hourController, "00", hourFocus),
+        _colon(),
+        _bracketBox(minuteController, "00", minuteFocus),
+        _colon(),
+        _bracketBox(secondController, "00", secondFocus),
+      ],
     );
   }
 }

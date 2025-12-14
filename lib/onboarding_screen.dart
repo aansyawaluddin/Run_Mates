@@ -108,6 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         _onboardingData[_currentPage]['title']!,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.heading3(
+                          weight: FontWeight.bold,
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -116,6 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         _onboardingData[_currentPage]['desc']!,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.paragraph1(
+                          weight: FontWeight.normal,
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -158,6 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text(
                         "MULAI",
                         style: AppTextStyles.button(
+                          weight: FontWeight.bold,
                           color: AppColors.textSecondary,
                         ),
                       ),

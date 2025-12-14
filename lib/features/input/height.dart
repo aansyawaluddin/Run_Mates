@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/weight.dart';
 
 class HeightPage extends StatefulWidget {
@@ -39,10 +41,10 @@ class _HeightPageState extends State<HeightPage> {
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 35),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,19 +53,21 @@ class _HeightPageState extends State<HeightPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 30),
-                  const Text(
+                  Text(
                     "Berapa tinggi badan kamu?",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.heading3(
+                      weight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     "Setiap usia punya kapasitas berbeda, kami sesuaikan latihan buat usia kamu",
                     textAlign: TextAlign.start,
-                    style: TextStyle(color: Colors.black, fontSize: 17),
+                    style: AppTextStyles.paragraph1(
+                      weight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -77,26 +81,23 @@ class _HeightPageState extends State<HeightPage> {
                     children: [
                       Text(
                         "$_currentHeight",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 64,
-                          fontWeight: FontWeight.bold,
+                        style: AppTextStyles.display1(
+                          weight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         "Cm",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
+                        style: AppTextStyles.heading4(
+                          weight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
                   SizedBox(
-                    height: 300,
+                    height: 420,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -128,19 +129,18 @@ class _HeightPageState extends State<HeightPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0XFFFF5050),
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
                         ),
                         elevation: 6,
                       ),
-                      child: const Text(
-                        "Continue",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: Text(
+                        'Lanjutkan',
+                        style: AppTextStyles.paragraph1(
+                          weight: FontWeight.bold,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -158,7 +158,7 @@ class _HeightPageState extends State<HeightPage> {
   Widget _buildPicker() {
     return SizedBox(
       width: 120,
-      height: 300,
+      height: 380,
       child: Stack(
         alignment: Alignment.center,
         clipBehavior: Clip.none,
@@ -167,9 +167,9 @@ class _HeightPageState extends State<HeightPage> {
             left: 0,
             child: Container(
               width: 90,
-              height: 300,
+              height: 380,
               decoration: BoxDecoration(
-                color: Color(0XFFFF5050),
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -180,7 +180,7 @@ class _HeightPageState extends State<HeightPage> {
             left: 0,
             child: SizedBox(
               width: 90,
-              height: 300,
+              height: 380,
               child: ListWheelScrollView.useDelegate(
                 controller: _scrollController,
                 itemExtent: 30,
@@ -213,7 +213,7 @@ class _HeightPageState extends State<HeightPage> {
                       child: Container(
                         width: tickWidth,
                         height: 2,
-                        color: Colors.white,
+                        color: AppColors.textSecondary,
                       ),
                     );
                   },
@@ -227,13 +227,13 @@ class _HeightPageState extends State<HeightPage> {
             left: 0,
             child: SizedBox(
               width: 90,
-              height: 300,
+              height: 380,
               child: Center(
                 child: Container(
                   height: 6,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -247,7 +247,7 @@ class _HeightPageState extends State<HeightPage> {
               width: 18,
               height: 15,
               child: CustomPaint(
-                painter: TriangleLeftPainter(color: Colors.black),
+                painter: TriangleLeftPainter(color: AppColors.textPrimary),
               ),
             ),
           ),
@@ -265,7 +265,7 @@ class _HeightPageState extends State<HeightPage> {
 
     return Container(
       width: 50,
-      height: 300,
+      height: 380,
       child: IgnorePointer(
         child: ListWheelScrollView.useDelegate(
           controller: _labelScrollController,
@@ -283,7 +283,9 @@ class _HeightPageState extends State<HeightPage> {
                 child: Text(
                   "$value",
                   style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.black,
+                    color: isSelected
+                        ? AppColors.textPrimary
+                        : AppColors.textPrimary,
                     fontSize: isSelected ? 18 : 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                   ),
@@ -299,7 +301,7 @@ class _HeightPageState extends State<HeightPage> {
 
 class TriangleLeftPainter extends CustomPainter {
   final Color color;
-  TriangleLeftPainter({this.color = Colors.white});
+  TriangleLeftPainter({this.color = AppColors.textSecondary});
 
   @override
   void paint(Canvas canvas, Size size) {

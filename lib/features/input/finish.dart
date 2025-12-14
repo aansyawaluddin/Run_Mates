@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/home.dart';
 
 class FinishScreen extends StatefulWidget {
@@ -30,7 +32,7 @@ class _FinishScreenState extends State<FinishScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: Stack(
         children: [
           /// confetti
@@ -44,7 +46,7 @@ class _FinishScreenState extends State<FinishScreen> {
               emissionFrequency: 0.04,
               numberOfParticles: 50,
               colors: const [
-                Color(0XFFFF5050),
+                AppColors.primary,
                 Color(0xFF4B0082),
                 Color(0xFF00FF7F),
               ],
@@ -63,7 +65,7 @@ class _FinishScreenState extends State<FinishScreen> {
                       width: 100,
                       height: 100,
                       decoration: const BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.textSecondary,
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -71,7 +73,7 @@ class _FinishScreenState extends State<FinishScreen> {
                           width: 85,
                           height: 85,
                           decoration: const BoxDecoration(
-                            color: Color(0XFFFF5050),
+                            color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -79,13 +81,13 @@ class _FinishScreenState extends State<FinishScreen> {
                               width: 50,
                               height: 50,
                               decoration: const BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.textSecondary,
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
                                 child: Icon(
                                   Icons.check_rounded,
-                                  color: Color(0XFFFF5050),
+                                  color: AppColors.primary,
                                   size: 42,
                                 ),
                               ),
@@ -96,21 +98,23 @@ class _FinishScreenState extends State<FinishScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    const Text(
+                    Text(
                       'Yeay!\nSemua udah\nsiap!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 43,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.heading2(
+                        weight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text(
+                    Text(
                       'Kami udah personalisasi program latihan berdasarkan data kamu. Yuk mulai lari dan capai target kamu!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style: AppTextStyles.paragraph1(
+                        weight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
 
                     const Spacer(),
@@ -135,19 +139,18 @@ class _FinishScreenState extends State<FinishScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0XFFFF5050),
+                              backgroundColor: AppColors.primary,
                               foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(40),
                               ),
                               elevation: 6,
                             ),
-                            child: const Text(
-                              "Done",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            child: Text(
+                              'Selesai',
+                              style: AppTextStyles.paragraph1(
+                                weight: FontWeight.bold,
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ),

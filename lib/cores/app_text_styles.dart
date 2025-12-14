@@ -23,37 +23,52 @@ class AppTextStyles {
     );
   }
 
-  static TextStyle display1({Color color = AppColors.textPrimary}) =>
-      _baseStyle(64, FontWeight.bold, color);
+  // Display
+  static TextStyle display1({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(64, weight, color);
 
   // Headings
-  static TextStyle heading1({Color color = AppColors.textPrimary}) =>
-      _baseStyle(56, FontWeight.bold, color);
+  static TextStyle heading1({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(56, weight, color);
 
-  static TextStyle heading2({Color color = AppColors.textPrimary}) =>
-      _baseStyle(48, FontWeight.bold, color);
+  static TextStyle heading2({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(48, weight, color);
 
-  static TextStyle heading3({Color color = AppColors.textPrimary}) =>
-      _baseStyle(32, FontWeight.bold, color);
+  static TextStyle heading3({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(32, weight, color);
 
-  static TextStyle heading4({Color color = AppColors.textPrimary}) =>
-      _baseStyle(24, FontWeight.bold, color);
+  static TextStyle heading4({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(24, weight, color);
 
-  static TextStyle heading4Uppercase({Color color = AppColors.textPrimary}) =>
-      _baseStyle(14, FontWeight.bold, color, letterSpacing: 1.0);
+  static TextStyle heading4Uppercase({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(14, weight, color, letterSpacing: 1.0);
 
   // Paragraph
-  static TextStyle paragraph1({Color color = AppColors.textPrimary}) =>
-      _baseStyle(15, FontWeight.normal, color, height: 1.5);
+  static TextStyle paragraph1({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.normal,
+  }) => _baseStyle(17, weight, color, height: 1.5);
 
   // Components
-  static TextStyle button({Color color = Colors.white}) =>
-      _baseStyle(16, FontWeight.bold, color);
+  static TextStyle button({
+    Color color = Colors.white,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(20, weight, color);
 
-  static TextStyle hyperlink({Color color = AppColors.textLink}) => _baseStyle(
-    16,
-    FontWeight.w600,
-    color,
-    decoration: TextDecoration.underline,
-  );
+  static TextStyle hyperlink({
+    Color color = AppColors.textLink,
+    FontWeight weight = FontWeight.w600, // SemiBold
+  }) => _baseStyle(16, weight, color, decoration: TextDecoration.underline);
 }

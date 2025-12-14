@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:runmates/component/notifikasi.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/finish.dart';
 import 'package:runmates/service/notifService.dart';
 
@@ -59,7 +61,7 @@ class NotificationPermissionScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -89,23 +91,24 @@ class NotificationPermissionScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
-              const Text(
+              Text(
                 'Aktifkan \nnotifikasi yuk',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  height: 1.1,
+                style: AppTextStyles.heading3(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              const Text(
+              Text(
                 'Biar RunMates bisa ingetin kamu tentang latihan kamu',
-                style: TextStyle(color: Colors.black, fontSize: 17),
+                style: AppTextStyles.paragraph1(
+                  weight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
               ),
 
               const SizedBox(height: 40),
@@ -140,19 +143,18 @@ class NotificationPermissionScreen extends StatelessWidget {
                         _requestNotificationPermission(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0XFFFF5050),
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
                         ),
                         elevation: 6,
                       ),
-                      child: const Text(
-                        "Continue",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: Text(
+                        'Lanjutkan',
+                        style: AppTextStyles.paragraph1(
+                          weight: FontWeight.bold,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),

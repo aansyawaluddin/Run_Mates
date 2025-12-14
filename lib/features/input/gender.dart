@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/age.dart';
 
 class GenderSelectionPage extends StatefulWidget {
@@ -12,9 +14,6 @@ class GenderSelectionPage extends StatefulWidget {
 enum Gender { male, female }
 
 class _GenderSelectionPageState extends State<GenderSelectionPage> {
-  final Color _primaryColor = const Color(0XFFFF5050);
-  final Color _darkBackground = const Color(0XFFFAFAFA);
-
   Gender? _selectedGender;
 
   @override
@@ -23,21 +22,20 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
     final horizontalPadding = screenWidth * 0.07;
 
     return Scaffold(
-      backgroundColor: _darkBackground,
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 30.0),
+              const SizedBox(height: 65.0),
 
               Text(
                 'Yuk kenalan dulu, kamu cowok atau cewek?',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.heading3(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
 
@@ -46,10 +44,9 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
               Text(
                 'Pria dan wanita butuh pendekatan latihan yang beda, kami sesuaikan buat kamu',
                 textAlign: TextAlign.start,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.paragraph1(
+                  weight: FontWeight.w500,
+                  color: AppColors.textPrimary,
                 ),
               ),
 
@@ -63,7 +60,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                 value: Gender.male,
               ),
 
-              const SizedBox(height: 24.0),
+              const SizedBox(height: 40.0),
 
               // Card Perempuan
               _buildGenderCard(
@@ -90,7 +87,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                               content: Text(
                                 'Silakan pilih gender terlebih dahulu',
                               ),
-                              backgroundColor: Colors.redAccent,
+                              backgroundColor: AppColors.primary,
                             ),
                           );
                           return;
@@ -101,17 +98,16 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                         );
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: _primaryColor,
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      child: Text(
+                        'Lanjutkan',
+                        style: AppTextStyles.paragraph1(
+                          weight: FontWeight.bold,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -136,7 +132,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
 
     final Widget checkboxIcon = Icon(
       isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-      color: isSelected ? _primaryColor : Colors.black,
+      color: isSelected ? AppColors.primary : Colors.black,
       size: 28,
     );
 
@@ -154,7 +150,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
           color: Color(0XFFF3F3F4),
           borderRadius: BorderRadius.circular(24.0),
           border: Border.all(
-            color: isSelected ? _primaryColor : Colors.transparent,
+            color: isSelected ? AppColors.primary : Colors.transparent,
             width: 3.0,
           ),
         ),
@@ -192,7 +188,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                     children: [
                       FaIcon(
                         icon,
-                        color: isSelected ? _primaryColor : Colors.black,
+                        color: isSelected ? AppColors.primary : Colors.black,
                         size: 26,
                       ),
                       const SizedBox(width: 10),

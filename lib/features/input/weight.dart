@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/goal.dart';
 
 class WeightScreen extends StatefulWidget {
@@ -66,33 +68,31 @@ class _WeightScreenState extends State<WeightScreen> {
     final width = MediaQuery.of(context).size.width;
     final screenWidth = width;
     return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.only(right: 24.0, left: 24.0, top: 35),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     SizedBox(height: 30),
                     Text(
                       "Berapa berat badan\nkamu sekarang?",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.heading3(
+                        weight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     SizedBox(height: 12),
                     Text(
                       "Tenang, ini cuma buat kami kasih latihan yang aman dan sesuai sama kemampuan kamu",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        fontWeight: FontWeight.normal,
+                      style: AppTextStyles.paragraph1(
+                        weight: FontWeight.w500,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -100,7 +100,7 @@ class _WeightScreenState extends State<WeightScreen> {
               ),
             ),
 
-            const SizedBox(height: 70),
+            const SizedBox(height: 87),
 
             SizedBox(
               height: 56,
@@ -122,8 +122,10 @@ class _WeightScreenState extends State<WeightScreen> {
                     child: Text(
                       '${value.toInt()}',
                       style: TextStyle(
-                        color: isSelected ? Colors.black : Colors.black,
-                        fontSize: isSelected ? 30 : 18,
+                        color: isSelected
+                            ? AppColors.textPrimary
+                            : AppColors.textPrimary,
+                        fontSize: isSelected ? 40 : 35,
                         fontWeight: isSelected
                             ? FontWeight.w800
                             : FontWeight.w600,
@@ -143,7 +145,7 @@ class _WeightScreenState extends State<WeightScreen> {
               child: Center(
                 child: SizedBox(
                   width: width,
-                  height: 96,
+                  height: 87,
                   child: Stack(
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
@@ -152,10 +154,8 @@ class _WeightScreenState extends State<WeightScreen> {
                         child: Center(
                           child: Container(
                             width: double.infinity,
-                            height: 96,
-                            decoration: BoxDecoration(
-                              color: Color(0XFFFF5050),
-                            ),
+                            height: 87,
+                            decoration: BoxDecoration(color: AppColors.primary),
                           ),
                         ),
                       ),
@@ -164,7 +164,7 @@ class _WeightScreenState extends State<WeightScreen> {
                       Positioned.fill(
                         child: Center(
                           child: SizedBox(
-                            height: 96,
+                            height: 87,
                             width: double.infinity,
                             child: PageView.builder(
                               controller: _tickController,
@@ -177,7 +177,7 @@ class _WeightScreenState extends State<WeightScreen> {
                                 final isMedium =
                                     index % 5 == 0 && !isBig; // tiap 0.5 kg
                                 final tickHeight = isBig
-                                    ? 44.0 
+                                    ? 44.0
                                     : (isMedium ? 26.0 : 12.0);
                                 final tickWidth = isBig ? 6.0 : 2.0;
                                 final tickRadius = isBig ? 3.0 : 2.0;
@@ -193,8 +193,8 @@ class _WeightScreenState extends State<WeightScreen> {
                                     height: tickHeight,
                                     decoration: BoxDecoration(
                                       color: isSelectedBig
-                                          ? Colors.white
-                                          : Colors.white,
+                                          ? AppColors.textSecondary
+                                          : AppColors.textSecondary,
                                       borderRadius: BorderRadius.circular(
                                         tickRadius,
                                       ),
@@ -213,7 +213,7 @@ class _WeightScreenState extends State<WeightScreen> {
                           width: 6,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -227,7 +227,7 @@ class _WeightScreenState extends State<WeightScreen> {
                           height: 20,
                           child: CustomPaint(
                             painter: TriangleUpPainter(
-                              color: Colors.black,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -249,19 +249,17 @@ class _WeightScreenState extends State<WeightScreen> {
                 children: [
                   Text(
                     _displayValue(),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.display1(
+                      weight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Kg',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                    style: AppTextStyles.heading4(
+                      weight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -289,19 +287,18 @@ class _WeightScreenState extends State<WeightScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0XFFFF5050),
-                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
                       elevation: 6,
                     ),
-                    child: const Text(
-                      "Continue",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    child: Text(
+                      'Lanjutkan',
+                      style: AppTextStyles.paragraph1(
+                        weight: FontWeight.bold,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
