@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 
 class NotificationCard extends StatelessWidget {
   final String title;
@@ -15,7 +17,7 @@ class NotificationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEEDEB),
+        color: AppColors.mutedCardBg,
         borderRadius: BorderRadius.circular(15.0),
       ),
       child: Column(
@@ -27,7 +29,7 @@ class NotificationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF0F172A),
+                  color: AppColors.textPrimary,
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset('assets/logo.png', height: 20),
@@ -36,19 +38,21 @@ class NotificationCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.paragraph1(
+                    weight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Text(
             description,
-            style: const TextStyle(color: Colors.black, fontSize: 12),
+            style: AppTextStyles.heading4Uppercase(
+              weight: FontWeight.normal,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),

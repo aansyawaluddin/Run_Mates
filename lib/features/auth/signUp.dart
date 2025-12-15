@@ -41,6 +41,7 @@ class _SignUpState extends State<SignUp> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Form(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -184,7 +185,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
 
                   // Field Kata Sandi
                   TextFormField(
@@ -343,7 +344,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       child: Text(
                         'Daftar',
-                        style: AppTextStyles.heading4(
+                        style: AppTextStyles.button(
                           weight: FontWeight.bold,
                           color: AppColors.bgLight,
                         ),
@@ -429,7 +430,7 @@ class _SignUpState extends State<SignUp> {
                             const SizedBox(width: 12.0),
                             Text(
                               'Sign in with Google',
-                              style: AppTextStyles.heading4Uppercase(
+                              style: AppTextStyles.button(
                                 weight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),

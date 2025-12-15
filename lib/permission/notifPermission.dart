@@ -152,7 +152,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                       ),
                       child: Text(
                         'Lanjutkan',
-                        style: AppTextStyles.paragraph1(
+                        style: AppTextStyles.button(
                           weight: FontWeight.bold,
                           color: AppColors.textSecondary,
                         ),

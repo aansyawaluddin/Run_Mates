@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/home.dart';
 
 class SingIn extends StatefulWidget {
@@ -9,9 +11,7 @@ class SingIn extends StatefulWidget {
 }
 
 class _SingInState extends State<SingIn> {
-  final Color _primaryColor = const Color(0XFFFF5050);
-  final Color _darkBackground = const Color(0XFFFAFAFA);
-
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -20,263 +20,302 @@ class _SingInState extends State<SingIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _darkBackground,
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 60),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      iconSize: 60,
-                      icon: Container(
-                        padding: const EdgeInsets.all(3.0),
-                        decoration: const BoxDecoration(
-                          color: Color(0XFFFF5050),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 60),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        iconSize: 60,
+                        icon: Container(
+                          padding: const EdgeInsets.all(3.0),
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Color(0XFFFF5050),
-                            size: 24,
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.primary,
+                              size: 24,
+                            ),
                           ),
                         ),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 100),
-                    Expanded(
-                      child: Text(
-                        'Welcome\nrunners !',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
+                      const SizedBox(width: 100),
+                      Expanded(
+                        child: Text(
+                          'Selamat Datang',
+                          style: AppTextStyles.heading2(
+                            weight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ).copyWith(height: 1),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 90.0),
-
-                // Email
-                TextField(
-                  controller: _emailController,
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'Email',
-                    hintStyle: TextStyle(color: Colors.black),
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 18.0,
-                      horizontal: 16.0,
-                    ),
+                    ],
                   ),
-                ),
 
-                const SizedBox(height: 24.0),
+                  const SizedBox(height: 96.0),
 
-                // Password
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
-                  keyboardType: TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                    hintStyle: TextStyle(color: Colors.black),
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 18.0,
-                      horizontal: 16.0,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.grey.shade600,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24.0),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
-
-                      debugPrint('Email: ${_emailController.text}');
-                      debugPrint('Password: ${_passwordController.text}');
+                  // Field Email
+                  TextFormField(
+                    controller: _emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email tidak boleh kosong';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Format email tidak valid';
+                      }
+                      return null;
                     },
-                    style: TextButton.styleFrom(
-                      backgroundColor: _primaryColor,
-                      shape: RoundedRectangleBorder(
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'Email',
+                      hintStyle: const TextStyle(color: Colors.black),
+                      filled: true,
+                      fillColor: AppColors.textSecondary,
+                      border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                    ),
-                    child: const Text(
-                      'Log In',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 32.0),
-
-                // Divider OR
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        'Or',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(color: Color(0XFFFF5050), thickness: 1),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24.0),
-
-                Center(
-                  child: Text(
-                    'sign up with',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                ),
-
-                const SizedBox(height: 24.0),
-
-                Center(
-                  child: Container(
-                    width: 250,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(80.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1.0,
                         ),
-                      ],
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 2.0,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18.0,
+                        horizontal: 16.0,
+                      ),
                     ),
-                    child: OutlinedButton(
+                  ),
+                  const SizedBox(height: 24.0),
+
+                  // Field Kata Sandi
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kata sandi wajib diisi';
+                      }
+                      if (value.length < 6) {
+                        return 'Kata sandi minimal 6 karakter';
+                      }
+                      return null;
+                    },
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: 'Kata Sandi',
+                      hintStyle: const TextStyle(color: Colors.black),
+                      filled: true,
+                      fillColor: AppColors.textSecondary,
+
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 2.0,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18.0,
+                        horizontal: 16.0,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24.0),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: TextButton(
                       onPressed: () {
-                        print('Sign up with Google (new button)');
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MainScreen(),
+                            ),
+                            (route) => false,
+                          );
+
+                          debugPrint('Email: ${_emailController.text}');
+                          debugPrint('Password: ${_passwordController.text}');
+                        }
                       },
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(
-                          color: Colors.grey.shade400,
-                          width: 1.5,
-                        ),
+
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(80.0),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'assets/google.png',
-                            height: 24.0,
-                            width: 24.0,
+                      child: Text(
+                        'Masuk',
+                        style: AppTextStyles.button(
+                          weight: FontWeight.bold,
+                          color: AppColors.bgLight,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32.0),
+
+                  // Divider OR
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(color: AppColors.primary, thickness: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          'Atau',
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.8),
+                            fontSize: 16,
                           ),
-                          const SizedBox(width: 12.0),
-                          const Text(
-                            'Sign in with Google',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(color: AppColors.primary, thickness: 1),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24.0),
+                  Center(
+                    child: Text(
+                      'Masuk Dengan',
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  Center(
+                    child: Container(
+                      width: 250,
+                      height: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(80.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
+                      child: OutlinedButton(
+                        onPressed: () {
+                          print('Sign up with Google');
+                        },
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: AppColors.textSecondary,
+                          side: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(80.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/google.png',
+                              height: 24.0,
+                              width: 24.0,
+                            ),
+                            const SizedBox(width: 12.0),
+                            Text(
+                              'Sign in with Google',
+                              style: AppTextStyles.button(
+                                weight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 32.0),
-              ],
+                  const SizedBox(height: 32.0),
+                ],
+              ),
             ),
           ),
         ),

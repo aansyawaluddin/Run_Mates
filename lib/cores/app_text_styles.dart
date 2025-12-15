@@ -53,7 +53,7 @@ class AppTextStyles {
   static TextStyle heading4Uppercase({
     Color color = AppColors.textPrimary,
     FontWeight weight = FontWeight.bold,
-  }) => _baseStyle(14, weight, color, letterSpacing: 1.0);
+  }) => _baseStyle(14, weight, color);
 
   // Paragraph
   static TextStyle paragraph1({

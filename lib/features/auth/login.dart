@@ -70,7 +70,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     child: Text(
                       'Daftar',
-                      style: AppTextStyles.heading4(
+                      style: AppTextStyles.button(
                         weight: FontWeight.bold,
                         color: AppColors.textSecondary,
                       ),
@@ -101,7 +101,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     child: Text(
                       'Masuk',
-                      style: AppTextStyles.heading4(
+                      style: AppTextStyles.button(
                         weight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
