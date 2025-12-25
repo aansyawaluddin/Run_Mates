@@ -21,6 +21,8 @@ class _GoalsPageState extends State<GoalsPage> {
   late final FocusNode _minuteFocusNode;
   late final FocusNode _secondFocusNode;
 
+  int? _selectedDistance;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +34,15 @@ class _GoalsPageState extends State<GoalsPage> {
     _hourFocusNode = FocusNode();
     _minuteFocusNode = FocusNode();
     _secondFocusNode = FocusNode();
+
+    _distanceController.addListener(() {
+      final value = int.tryParse(_distanceController.text);
+      if (value != _selectedDistance) {
+        setState(() {
+          _selectedDistance = value;
+        });
+      }
+    });
   }
 
   @override
@@ -47,6 +58,16 @@ class _GoalsPageState extends State<GoalsPage> {
     super.dispose();
   }
 
+  bool _validateInput() {
+    final isDistanceFilled = _distanceController.text.isNotEmpty;
+    final isTimeFilled =
+        _hourController.text.isNotEmpty ||
+        _minuteController.text.isNotEmpty ||
+        _secondController.text.isNotEmpty;
+
+    return isDistanceFilled && isTimeFilled;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -59,7 +80,7 @@ class _GoalsPageState extends State<GoalsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
               Text(
                 "Yuk set target kamu!",
                 style: AppTextStyles.heading3(
@@ -69,23 +90,55 @@ class _GoalsPageState extends State<GoalsPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Berapa KM yang mau kamu taklukkan dan dalam waktu berapa?",
+                "Pilih target jarak kamu atau atur sendiri sesuai keinginan",
                 style: AppTextStyles.paragraph1(
                   weight: FontWeight.w500,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 60),
 
-              // Distance
+              const SizedBox(height: 24),
+
+              // Pilihan Cepat
               Text(
-                "Jarak",
+                "Pilihan Cepat",
                 style: AppTextStyles.heading4(
                   weight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildQuickOption("5K", 5),
+                  _buildQuickOption("10K", 10),
+                  _buildQuickOption("21K", 21),
+                  _buildQuickOption("42K", 42),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // Kustomisasi Target
+              Text(
+                "Kustomisasi Target",
+                style: AppTextStyles.heading4(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Distance Input
+              Text(
+                "Jarak",
+                style: AppTextStyles.paragraph1(
+                  weight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
 
               TextField(
                 controller: _distanceController,
@@ -104,11 +157,12 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                   filled: true,
                   fillColor: AppColors.textSecondary,
-
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
+                    borderSide: BorderSide(
+                      color: _selectedDistance != null
+                          ? AppColors.primary
+                          : Colors.grey.shade400,
                       width: 2.0,
                     ),
                   ),
@@ -125,17 +179,17 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Time
+              // Time Input
               Text(
                 "Waktu",
-                style: AppTextStyles.heading4(
-                  weight: FontWeight.bold,
+                style: AppTextStyles.paragraph1(
+                  weight: FontWeight.w500,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               _TimeInput(
                 hourController: _hourController,
@@ -146,9 +200,8 @@ class _GoalsPageState extends State<GoalsPage> {
                 secondFocus: _secondFocusNode,
               ),
 
-              const SizedBox(height: 160),
+              const SizedBox(height: 60),
 
-              // Button
               Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -160,12 +213,24 @@ class _GoalsPageState extends State<GoalsPage> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ScheduleScreen(),
-                          ),
-                        );
+                        if (_validateInput()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ScheduleScreen(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Mohon isi jarak dan waktu terlebih dahulu",
+                              ),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -192,9 +257,46 @@ class _GoalsPageState extends State<GoalsPage> {
       ),
     );
   }
+
+  Widget _buildQuickOption(String label, int value) {
+    final isSelected = _selectedDistance == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedDistance = value;
+            _distanceController.text = value.toString();
+            FocusScope.of(context).unfocus();
+          });
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            border: Border.all(
+              color: isSelected ? AppColors.primary : Colors.grey.shade400,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
+              color: isSelected
+                  ? AppColors.textSecondary
+                  : AppColors.textPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-/// Widget input waktu yang sudah disesuaikan stylenya
+/// Widget input waktu 
 class _TimeInput extends StatelessWidget {
   const _TimeInput({
     required this.hourController,
@@ -265,7 +367,7 @@ class _TimeInput extends StatelessWidget {
       ":",
       style: AppTextStyles.heading2(
         weight: FontWeight.bold,
-        color: AppColors.textPrimary, 
+        color: AppColors.textPrimary,
       ),
     ),
   );

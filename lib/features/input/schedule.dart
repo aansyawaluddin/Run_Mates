@@ -47,7 +47,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 Text(
                   'Hari apa aja kamu ada waktu luang?',
                   style: AppTextStyles.heading3(

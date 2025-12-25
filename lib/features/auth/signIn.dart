@@ -25,7 +25,6 @@ class _SingInState extends State<SingIn> {
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
@@ -75,6 +74,7 @@ class _SingInState extends State<SingIn> {
 
                   // Field Email
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -126,6 +126,7 @@ class _SingInState extends State<SingIn> {
 
                   // Field Kata Sandi
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     validator: (value) {

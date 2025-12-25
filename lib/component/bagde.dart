@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
 
 void showBadgeUnlockPopup(BuildContext context) {
   showDialog(
@@ -15,8 +16,6 @@ class BadgeUnlockDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0XFFFF5050);
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
@@ -44,7 +43,7 @@ class BadgeUnlockDialog extends StatelessWidget {
               "Badge baru terbuka!",
               style: TextStyle(
                 fontSize: 14,
-                color: primaryColor,
+                color: AppColors.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -64,7 +63,7 @@ class BadgeUnlockDialog extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: primaryColor,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 10),
@@ -94,12 +93,12 @@ class BadgeUnlockDialog extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                   elevation: 5,
-                  shadowColor: primaryColor.withOpacity(0.4),
+                  shadowColor: AppColors.primary.withOpacity(0.4),
                 ),
                 child: const Text(
                   "Tantang Diri Lebih Jauh",
@@ -122,15 +121,15 @@ class BadgeUnlockDialog extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: primaryColor,
+                  foregroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                     side: const BorderSide(
-                      color: primaryColor,
+                      color: AppColors.primary,
                       width: 1,
-                    ), // Border merah
+                    ),
                   ),
-                  elevation: 3, // Tetap ada shadow sesuai gambar
+                  elevation: 3,
                   shadowColor: Colors.grey.withOpacity(0.2),
                 ),
                 child: const Text(
@@ -138,7 +137,7 @@ class BadgeUnlockDialog extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: primaryColor,
+                    color: AppColors.primary,
                   ),
                 ),
               ),

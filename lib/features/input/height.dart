@@ -52,7 +52,7 @@ class _HeightPageState extends State<HeightPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   Text(
                     "Berapa tinggi badan kamu?",
                     style: AppTextStyles.heading3(

@@ -29,7 +29,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 65.0),
+              const SizedBox(height: 45.0),
 
               Text(
                 'Yuk kenalan dulu, kamu cowok atau cewek?',

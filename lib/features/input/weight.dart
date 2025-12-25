@@ -79,7 +79,7 @@ class _WeightScreenState extends State<WeightScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 30),
+                    SizedBox(height: 10),
                     Text(
                       "Berapa berat badan\nkamu sekarang?",
                       style: AppTextStyles.heading3(

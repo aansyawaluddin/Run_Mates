@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,8 +31,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color RedColor = Color(0XFFFF5050);
-    const Color cardBackground = Color(0XFFeeeded);
     final double bottomSpacing = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -38,10 +38,9 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(
           'Halo, Runners!',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25,
-            color: Color(0XFFFF5050),
+          style: AppTextStyles.heading4(
+            weight: FontWeight.bold,
+            color: AppColors.primary,
           ),
         ),
         automaticallyImplyLeading: false,
@@ -60,7 +59,7 @@ class _HomePageState extends State<HomePage> {
               child: const Icon(
                 Icons.notifications_none_outlined,
                 size: 28,
-                color: RedColor,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
+          decoration: const BoxDecoration(color: AppColors.textSecondary),
         ),
       ),
       body: SingleChildScrollView(
@@ -108,11 +107,11 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
 
               // card program lari
-              _buildProgramCard(cardBackground, RedColor),
+              _buildProgramCard(),
               const SizedBox(height: 20),
 
               // card progress minggu ini
-              _buildWeeklyProgressCard(cardBackground, RedColor),
+              _buildWeeklyProgressCard(),
               const SizedBox(height: 20),
             ],
           ),
@@ -149,22 +148,11 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.cyan.shade400,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Text(
-                      'TIPS!',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
+                  Text(
+                    'TIPS!',
+                    style: AppTextStyles.heading4(
+                      weight: FontWeight.bold,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   Row(
@@ -174,16 +162,15 @@ class _HomePageState extends State<HomePage> {
                       Flexible(
                         child: Text(
                           text,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.paragraph1(
+                            weight: FontWeight.w500,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
                       const Icon(
                         Icons.arrow_forward_ios_rounded,
-                        color: Colors.white,
+                        color: AppColors.textSecondary,
                         size: 24,
                       ),
                     ],
@@ -210,7 +197,7 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: _currentPage == index
-                ? const Color(0XFF00DEEC)
+                ? AppColors.primary
                 : Colors.grey.shade700,
           ),
         );
@@ -223,7 +210,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0XFFFF5050),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -234,29 +221,27 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 'Latihan hari ini • Minggu 1, Hari 3',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                style: AppTextStyles.heading4Uppercase(
+                  weight: FontWeight.normal,
+                  color: AppColors.textSecondary,
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   // Aksi untuk 'Lihat detail'
                 },
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       'Lihat detail',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: Color(0XFF00DEEC),
+                      color: AppColors.textSecondary,
                       size: 16,
                     ),
                   ],
@@ -265,18 +250,20 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'INTERVAL RUN',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Melatih daya tahan & kecepatan',
-            style: TextStyle(color: Colors.white, fontSize: 14),
+            style: AppTextStyles.heading4Uppercase(
+              weight: FontWeight.normal,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -284,28 +271,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card program lari
-  Widget _buildProgramCard(Color cardBackground, Color RedColor) {
+  Widget _buildProgramCard() {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: cardBackground,
+        color: AppColors.mutedCardBg,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Program lari 20K',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '12 Minggu • Target : 20K dalam 1 jam',
-            style: TextStyle(color: Colors.black, fontSize: 12),
+            style: AppTextStyles.heading4Uppercase(
+              weight: FontWeight.normal,
+              color: AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -313,14 +302,16 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 'Progress program',
-                style: TextStyle(color: Colors.black, fontSize: 12),
+                style: AppTextStyles.heading4Uppercase(
+                  weight: FontWeight.normal,
+                  color: AppColors.textPrimary,
+                ),
               ),
-              const Text(
+              Text(
                 '25%',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.heading4Uppercase(
+                  weight: FontWeight.normal,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -329,9 +320,9 @@ class _HomePageState extends State<HomePage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: 0.25, // 25%
+              value: 0.25,
               backgroundColor: Colors.grey[800],
-              valueColor: AlwaysStoppedAnimation<Color>(RedColor),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               minHeight: 10,
             ),
           ),
@@ -341,22 +332,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card progress minggu ini
-  Widget _buildWeeklyProgressCard(Color cardBackground, Color RedColor) {
+  Widget _buildWeeklyProgressCard() {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: cardBackground,
+        color: AppColors.mutedCardBg,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Progress Minggu Ini',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -384,38 +374,39 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 16),
-          Divider(color: Colors.white),
+          const Divider(color: Colors.white),
           const SizedBox(height: 8),
           // baris peningkatan
           Row(
             children: [
-              Icon(Icons.trending_up, color: RedColor, size: 20),
+              Icon(Icons.trending_up, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Peningkatan minggu ini',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     Text(
                       'Jarak lari meningkat 2KM dari minggu lalu',
-                      style: TextStyle(color: Colors.black, fontSize: 12),
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const Text(
+              Text(
                 '+20%',
-                style: TextStyle(
-                  color: Color(0XFFFF5050),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                style: AppTextStyles.heading4Uppercase(
+                  weight: FontWeight.w500,
+                  color: AppColors.primary,
                 ),
               ),
             ],
@@ -431,21 +422,26 @@ class _HomePageState extends State<HomePage> {
       width: MediaQuery.of(context).size.width / 3.8,
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Color(0XFFFF5050),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.heading4(
+              weight: FontWeight.bold,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
-          Text(unit, style: TextStyle(color: Colors.white, fontSize: 14)),
+          Text(
+            unit,
+            style: AppTextStyles.heading4Uppercase(
+              weight: FontWeight.normal,
+              color: AppColors.textSecondary,
+            ),
+          ),
         ],
       ),
     );
@@ -460,14 +456,11 @@ class _HomePageState extends State<HomePage> {
     Color circleColor = Colors.white;
     Widget child = Text(
       day,
-      style: TextStyle(
-        color: isRed ? const Color(0XFFFF5050) : Color(0XFFFF5050),
-        fontWeight: FontWeight.bold,
-      ),
+      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
     );
 
     if (isDone) {
-      circleColor = const Color(0XFFFF5050);
+      circleColor = AppColors.primary;
       child = const Icon(Icons.check, color: Colors.white, size: 16);
     }
 

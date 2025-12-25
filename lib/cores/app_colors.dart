@@ -19,7 +19,6 @@ class AppColors {
   static const Color neutral = Color(0xFFC5C5C5);
 
   // Card Backgrounds with Opacity (Helpers)
-  // Gunakan .withOpacity() jika ingin dinamis, atau konstanta ini:
   static Color elevatedCardBg = const Color(0xFFFFFFFF).withOpacity(0.20);
   static Color subtleCardBg = const Color(0xFFFFFFFF).withOpacity(0.05);
   static Color mutedCardBg = const Color(0xFFC2C2C2).withOpacity(0.20);

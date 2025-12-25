@@ -41,7 +41,6 @@ class _SignUpState extends State<SignUp> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Form(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -89,6 +88,7 @@ class _SignUpState extends State<SignUp> {
 
                   // Field Email
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -189,6 +189,7 @@ class _SignUpState extends State<SignUp> {
 
                   // Field Kata Sandi
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     validator: (value) {
@@ -255,6 +256,7 @@ class _SignUpState extends State<SignUp> {
 
                   // Field Konfirmasi Kata Sandi
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
                     validator: (value) {

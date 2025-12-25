@@ -26,7 +26,7 @@ class _AgePageState extends State<AgePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 65),
+            const SizedBox(height: 45),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
