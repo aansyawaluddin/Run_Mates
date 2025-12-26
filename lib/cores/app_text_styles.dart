@@ -50,6 +50,11 @@ class AppTextStyles {
     FontWeight weight = FontWeight.bold,
   }) => _baseStyle(24, weight, color);
 
+  static TextStyle heading5({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(20, weight, color);
+
   static TextStyle heading4Uppercase({
     Color color = AppColors.textPrimary,
     FontWeight weight = FontWeight.bold,
@@ -61,11 +66,21 @@ class AppTextStyles {
     FontWeight weight = FontWeight.normal,
   }) => _baseStyle(17, weight, color, height: 1.5);
 
+    static TextStyle paragraph2({
+    Color color = AppColors.textPrimary,
+    FontWeight weight = FontWeight.normal,
+  }) => _baseStyle(15, weight, color, height: 1.5);
+
   // Components
   static TextStyle button({
     Color color = Colors.white,
     FontWeight weight = FontWeight.bold,
   }) => _baseStyle(20, weight, color);
+
+  static TextStyle button2({
+    Color color = Colors.white,
+    FontWeight weight = FontWeight.bold,
+  }) => _baseStyle(13, weight, color);
 
   static TextStyle hyperlink({
     Color color = AppColors.textLink,

@@ -94,7 +94,7 @@ class _SignUpState extends State<SignUp> {
                       if (value == null || value.isEmpty) {
                         return 'Email tidak boleh kosong';
                       }
-                      if (!value.contains('@')) {
+                      if (!value.contains('@gmail.com')) {
                         return 'Format email tidak valid';
                       }
                       return null;

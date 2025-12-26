@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/features/main/programDay.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/features/main/program_day.dart';
 
 class ProgramWeekPage extends StatelessWidget {
   const ProgramWeekPage({super.key});
@@ -7,46 +9,34 @@ class ProgramWeekPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> pekanList = [
-      {'pekan': 1, 'color': const Color(0XFFFF5050)},
-      {'pekan': 2, 'color': const Color(0XFFFF5050)},
-      {'pekan': 3, 'color': const Color(0XFFFF5050)},
-      {'pekan': 4, 'color': const Color(0XFFFF5050)},
+      {'pekan': 1, 'color': AppColors.primary},
+      {'pekan': 2, 'color': AppColors.primary},
+      {'pekan': 3, 'color': AppColors.primary},
+      {'pekan': 4, 'color': AppColors.primary},
     ];
 
     final int totalWeeks = pekanList.length;
-    final double bottomSpacing = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0XFFFAFAFA),
-        title: const Text(
+        backgroundColor: AppColors.textSecondary,
+        title: Text(
           'Program Latihan',
-          style: TextStyle(
-            color: Color(0XFFFF5050),
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
+          style: AppTextStyles.heading4(
+            weight: FontWeight.bold,
+            color: AppColors.primary,
           ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(
-              Icons.notifications_none,
-              color: Color(0XFFFF5050),
-              size: 28,
-            ),
-          ),
-        ],
         elevation: 0,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
+          decoration: BoxDecoration(color: AppColors.textSecondary),
         ),
       ),
       body: Container(
         color: const Color(0XFFFAFAFA),
         child: ListView.builder(
-          padding: EdgeInsets.fromLTRB(16, 0, 16, bottomSpacing),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           itemCount: pekanList.length,
           itemBuilder: (context, index) {
             final item = pekanList[index];
@@ -55,7 +45,7 @@ class ProgramWeekPage extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: SizedBox(
-                height: 140,
+                height: 164,
                 child: ElevatedButton(
                   onPressed: isEnabled
                       ? () {
@@ -69,9 +59,6 @@ class ProgramWeekPage extends StatelessWidget {
                               ),
                             ),
                           );
-                          print(
-                            'Navigasi ke Week $selectedWeek dari $totalWeeks minggu',
-                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -82,16 +69,30 @@ class ProgramWeekPage extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     elevation: 5,
                   ),
-                  child: Center(
-                    child: Text(
-                      'PEKAN ${item['pekan']}',
-                      style: TextStyle(
-                        color: isEnabled ? Colors.white : Colors.white70,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        'PEKAN',
+                        style: TextStyle(
+                          color: isEnabled ? Colors.white : Colors.white70,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Text(
+                        '${item['pekan']}',
+                        style: TextStyle(
+                          color: isEnabled ? Colors.white : Colors.white70,
+                          fontSize: 96,
+                          fontWeight: FontWeight.bold,
+                          height: 0.9,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

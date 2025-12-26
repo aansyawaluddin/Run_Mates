@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/features/main/detailProgram.dart';
+import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/features/main/detail_program.dart';
 
 class ProgramDayPage extends StatelessWidget {
   final int weekNumber;
@@ -12,7 +14,7 @@ class ProgramDayPage extends StatelessWidget {
   });
 
   final List<Map<String, dynamic>> dailyWorkouts = const [
-    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': false},
+    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': true},
     {'day': 'Selasa', 'title': 'Short Train', 'isCompleted': false},
     {'day': 'Rabu', 'title': 'Tempo Run', 'isCompleted': false},
     {'day': 'Kamis', 'title': 'Interval Run', 'isCompleted': false},
@@ -23,17 +25,14 @@ class ProgramDayPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryRed = Color(0XFFFF5050);
-
     return Scaffold(
       backgroundColor: const Color(0XFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
+                horizontal: 32.0,
                 vertical: 18.0,
               ),
               child: Row(
@@ -44,7 +43,7 @@ class ProgramDayPage extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(3.0),
                       decoration: const BoxDecoration(
-                        color: primaryRed,
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                       child: Container(
@@ -55,7 +54,7 @@ class ProgramDayPage extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.arrow_back,
-                          color: primaryRed,
+                          color: AppColors.primary,
                           size: 20,
                         ),
                       ),
@@ -67,24 +66,9 @@ class ProgramDayPage extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Pekan $weekNumber dari $totalWeeks',
-                      style: const TextStyle(
-                        color: primaryRed,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
-
-                  GestureDetector(
-                    onTap: () {
-                      // TODO: aksi ketika tap notifikasi
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.only(right: 4.0),
-                      child: Icon(
-                        Icons.notifications_none,
-                        color: primaryRed,
-                        size: 28,
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -96,7 +80,7 @@ class ProgramDayPage extends StatelessWidget {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
+                  horizontal: 32.0,
                   vertical: 8.0,
                 ),
                 itemCount: dailyWorkouts.length,
@@ -131,21 +115,19 @@ class ProgramDayPage extends StatelessWidget {
     required bool isCompleted,
     required VoidCallback onTap,
   }) {
-    const Color primaryRed = Color(0xFFF44336);
-
-    final Color cardColor = isCompleted ? primaryRed : Colors.white;
-    final Color textColor = isCompleted ? Colors.white : primaryRed;
+    final Color cardColor = isCompleted ? AppColors.primary : Colors.white;
+    final Color textColor = isCompleted ? Colors.white : AppColors.primary;
     final Border? border = isCompleted
         ? null
-        : Border.all(color: primaryRed, width: 1.5);
+        : Border.all(color: AppColors.primary, width: 1.5);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: GestureDetector(
         onTap: isCompleted ? null : onTap,
         child: Container(
-          height: 100,
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+          height: 115,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 13.0),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(15),
@@ -153,7 +135,7 @@ class ProgramDayPage extends StatelessWidget {
             boxShadow: [
               if (isCompleted)
                 BoxShadow(
-                  color: primaryRed.withOpacity(0.4),
+                  color: AppColors.primary.withOpacity(0.4),
                   spreadRadius: 1,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
@@ -169,19 +151,17 @@ class ProgramDayPage extends StatelessWidget {
                 children: [
                   Text(
                     day,
-                    style: TextStyle(
-                      color: isCompleted ? Colors.white : primaryRed,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.heading4(
+                      weight: FontWeight.bold,
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     title,
-                    style: TextStyle(
+                    style: AppTextStyles.heading3(
+                      weight: FontWeight.bold,
                       color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
