@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/component/bagde.dart';
 import 'package:runmates/component/finish_confirmation.dart';
+import 'package:runmates/component/training_finish.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 
@@ -252,18 +253,16 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                   onPressed: _isFinished
                       ? null
                       : () {
-                          // PANGGIL DIALOG DARI FILE TERPISAH DISINI
                           showDialog(
                             context: context,
                             builder: (context) {
                               return FinishConfirmation(
                                 onConfirm: () {
-                                  // Logika yang jalan setelah user klik "Ya"
                                   setState(() {
                                     _isFinished = true;
                                   });
-                                  // Munculkan Badge
-                                  showBadgeUnlockPopup(context);
+                                  // showBadgeUnlockPopup( context);
+                                  showTrainingFinishDialog(context);
                                 },
                               );
                             },

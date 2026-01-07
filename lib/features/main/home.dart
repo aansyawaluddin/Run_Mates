@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/features/main/notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,12 +50,10 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: GestureDetector(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const NotificationPage(),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
+                );
               },
               child: const Icon(
                 Icons.notifications_none_outlined,

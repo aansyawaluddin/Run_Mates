@@ -23,6 +23,8 @@ class _GoalsPageState extends State<GoalsPage> {
 
   int? _selectedDistance;
 
+  bool _showErrorText = false;
+
   @override
   void initState() {
     super.initState();
@@ -99,9 +101,22 @@ class _GoalsPageState extends State<GoalsPage> {
 
               const SizedBox(height: 24),
 
+              if (_showErrorText)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Text(
+                    'Ayo, isi target jarak dan waktu kamu dulu',
+                    textAlign: TextAlign.start,
+                    style: AppTextStyles.paragraph1(
+                      weight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+
               // Pilihan Cepat
               Text(
-                "Pilihan Cepat",
+                "Rekomendasi Kami",
                 style: AppTextStyles.heading4(
                   weight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -213,24 +228,18 @@ class _GoalsPageState extends State<GoalsPage> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_validateInput()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ScheduleScreen(),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Mohon isi jarak dan waktu terlebih dahulu",
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
+                        if (!_validateInput()) {
+                          setState(() {
+                            _showErrorText = true;
+                          });
+                          return; 
                         }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ScheduleScreen(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -296,7 +305,7 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 }
 
-/// Widget input waktu 
+/// Widget input waktu
 class _TimeInput extends StatelessWidget {
   const _TimeInput({
     required this.hourController,

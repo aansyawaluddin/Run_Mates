@@ -16,6 +16,8 @@ enum Gender { male, female }
 class _GenderSelectionPageState extends State<GenderSelectionPage> {
   Gender? _selectedGender;
 
+  bool _showErrorText = false;
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -50,6 +52,21 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                 ),
               ),
 
+              const SizedBox(height: 12.0),
+
+              if (_showErrorText)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Text(
+                    'Pilih salah satu ya untuk melanjutkan',
+                    textAlign: TextAlign.start,
+                    style: AppTextStyles.paragraph1(
+                      weight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+
               const SizedBox(height: 40.0),
 
               // Card Laki-laki
@@ -72,7 +89,6 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
 
               const Spacer(),
 
-              // Continue
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 32.0, top: 20.0),
@@ -82,14 +98,9 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                     child: TextButton(
                       onPressed: () {
                         if (_selectedGender == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Silakan pilih gender terlebih dahulu',
-                              ),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
+                          setState(() {
+                            _showErrorText = true;
+                          });
                           return;
                         }
                         Navigator.push(
@@ -140,6 +151,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
       onTap: () {
         setState(() {
           _selectedGender = value;
+          _showErrorText = false;
         });
       },
       child: Container(
@@ -147,7 +159,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Color(0XFFF3F3F4),
+          color: const Color(0XFFF3F3F4),
           borderRadius: BorderRadius.circular(24.0),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.transparent,

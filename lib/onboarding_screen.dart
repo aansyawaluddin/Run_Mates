@@ -23,9 +23,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
     {
       "image": "assets/images/welcome_2.png",
-      "title": "Program yang Disesuaikan Khusus Buat Kamu",
+      "title": "Program yang Dibuat Khusus Buat Kamu",
       "desc":
-          "Setiap orang beda. Kami bikin program latihan yang pas sama level, tujuan, dan jadwal kamu",
+          "Kami bikin program latihan yang pas sama level, tujuan, dan jadwal kamu",
     },
     {
       "image": "assets/images/welcome_3.png",

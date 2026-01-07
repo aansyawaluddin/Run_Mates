@@ -31,8 +31,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       } else {
         _selectedDays.add(day);
       }
+      if (_selectedDays.isNotEmpty) {
+        _showErrorText = false;
+      }
     });
   }
+
+  bool _showErrorText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +60,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 Text(
                   'Kami tau kamu sibuk, pilih hari yang realistis buat kamu latihan',
                   style: AppTextStyles.paragraph1(
@@ -63,7 +68,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+
+                if (_showErrorText)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'Belum ada hari yang dipilih nih!',
+                      textAlign: TextAlign.start,
+                      style: AppTextStyles.paragraph1(
+                        weight: FontWeight.w500,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
 
                 // Pilih hari
                 Text(
@@ -96,13 +114,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_selectedDays.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Pilih setidaknya satu hari.'),
-                                backgroundColor: Colors.redAccent,
-                              ),
-                            );
-                            return;
+                            setState(() {
+                              _showErrorText = true; 
+                            });
+                            return; 
                           }
                           Navigator.push(
                             context,
