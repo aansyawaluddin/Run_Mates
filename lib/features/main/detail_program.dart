@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/component/bagde.dart';
-import 'package:runmates/component/finish_confirmation.dart';
-import 'package:runmates/component/training_finish.dart';
+import 'package:runmates/component/popUp/bagde_achieve.dart';
+import 'package:runmates/component/popUp/finish_confirmation.dart';
+import 'package:runmates/component/popUp/finish_popup.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 
@@ -17,6 +18,7 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final parentContext = context;
     return Scaffold(
       backgroundColor: AppColors.textSecondary,
       body: SafeArea(
@@ -254,15 +256,21 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                       ? null
                       : () {
                           showDialog(
-                            context: context,
-                            builder: (context) {
+                            context: parentContext,
+                            builder: (dialogContext) {
                               return FinishConfirmation(
-                                onConfirm: () {
+                                onConfirm: () async {
+                                  if (!mounted) return;
+
                                   setState(() {
                                     _isFinished = true;
                                   });
-                                  // showBadgeUnlockPopup( context);
-                                  showTrainingFinishDialog(context);
+
+                                  if (!mounted) return;
+                                  await showFinishPopUp(parentContext);
+
+                                  if (!mounted) return;
+                                  shoBagdeAchieve(parentContext);
                                 },
                               );
                             },

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 
-void showTrainingFinishDialog(BuildContext context) {
-  showDialog(
+Future<void> showFinishPopUp(BuildContext context) {
+  return showDialog<void>(
     context: context,
     barrierDismissible: true,
     barrierColor: Colors.transparent,
@@ -43,7 +43,11 @@ void showTrainingFinishDialog(BuildContext context) {
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
-                  child: Icon(Icons.check, color: Colors.white, size: 32),
+                  child: Icon(
+                    Icons.check,
+                    color: AppColors.textSecondary,
+                    size: 40,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -59,7 +63,6 @@ void showTrainingFinishDialog(BuildContext context) {
                         color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 8),
                     Text(
                       'Latihan hari ini berhasil diselesaikan.\nKeep up the good work!',
                       style: AppTextStyles.heading4Uppercase(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -53,16 +54,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Color(0XFFFAFAFA),
+        backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        leading: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            margin: const EdgeInsets.only(left: 18),
+            padding: const EdgeInsets.all(3.0),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(1.0),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ),
+          ),
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
         ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(

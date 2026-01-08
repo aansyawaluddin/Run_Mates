@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/features/auth/login.dart';
-import 'package:runmates/features/main/editProfile.dart';
+import 'package:runmates/features/main/badge.dart';
+import 'package:runmates/features/main/edit_profile.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -110,27 +112,87 @@ class ProfilePage extends StatelessWidget {
               // Lencana
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Lencana",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Lencana",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
-                  ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BadgePage(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            "Lihat lainnya",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.chevron_right,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
               const SizedBox(height: 15),
 
               // Badge
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildBadgePlaceholder("MILESTONE", "5K", primaryColor),
+                  SizedBox(
+                    height: 120, 
+                    width: 100, 
+                    child: Image.asset(
+                      'assets/images/lencana.png', 
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.shield,
+                          size: 80,
+                          color: Colors.grey,
+                        );
+                      },
+                    ),
+                  ),
                   const SizedBox(width: 20),
-                  _buildBadgePlaceholder("FINISH", "RUN", primaryColor),
+                  SizedBox(
+                    height: 120,
+                    width: 100,
+                    child: Image.asset(
+                      'assets/images/lencana.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.shield,
+                          size: 80,
+                          color: Colors.grey,
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -298,44 +360,6 @@ class ProfilePage extends StatelessWidget {
             if (!isLogout) const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
-      ),
-    );
-  }
-
-  // Widget Badge
-  Widget _buildBadgePlaceholder(String topText, String mainText, Color color) {
-    return Container(
-      width: 100,
-      height: 120,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: color, width: 2),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              topText,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            mainText,
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w900,
-              color: color,
-            ),
-          ),
-        ],
       ),
     );
   }
