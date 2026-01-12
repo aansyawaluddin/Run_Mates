@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
-import 'package:runmates/permission/notifPermission.dart';
+import 'package:runmates/permission/notif_permission.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
-class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
+class SchedulePage extends StatefulWidget {
+  const SchedulePage({super.key});
 
   @override
-  State<ScheduleScreen> createState() => _ScheduleScreenState();
+  State<SchedulePage> createState() => _SchedulePageState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _SchedulePageState extends State<SchedulePage> {
   final Set<String> _selectedDays = {};
 
   final List<String> _days = [
@@ -115,10 +117,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         onPressed: () {
                           if (_selectedDays.isEmpty) {
                             setState(() {
-                              _showErrorText = true; 
+                              _showErrorText = true;
                             });
-                            return; 
+                            return;
                           }
+                          context.read<RegistrationProvider>().setSchedule(
+                            _selectedDays.toList(),
+                          );
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/goal.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
-class WeightScreen extends StatefulWidget {
-  const WeightScreen({super.key});
+class WeightPage extends StatefulWidget {
+  const WeightPage({super.key});
 
   @override
-  State<WeightScreen> createState() => _WeightScreenState();
+  State<WeightPage> createState() => _WeightPageState();
 }
 
-class _WeightScreenState extends State<WeightScreen> {
+class _WeightPageState extends State<WeightPage> {
   double _currentValue = 65.0;
   final int _minValue = 40;
   final int _maxValue = 150;
@@ -279,6 +281,9 @@ class _WeightScreenState extends State<WeightScreen> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
+                      context.read<RegistrationProvider>().setWeight(
+                        _currentValue,
+                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(

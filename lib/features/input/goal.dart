@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/schedule.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({super.key});
@@ -232,12 +234,25 @@ class _GoalsPageState extends State<GoalsPage> {
                           setState(() {
                             _showErrorText = true;
                           });
-                          return; 
+                          return;
                         }
+                        double distanceVal =
+                            double.tryParse(_distanceController.text) ?? 0.0;
+                        int hours = int.tryParse(_hourController.text) ?? 0;
+                        int minutes = int.tryParse(_minuteController.text) ?? 0;
+                        int totalMinutes = (hours * 60) + minutes;
+                        if (totalMinutes == 0 &&
+                            (int.tryParse(_secondController.text) ?? 0) > 0) {
+                          totalMinutes = 1;
+                        }
+                        context.read<RegistrationProvider>().setGoal(
+                          distanceVal,
+                          totalMinutes,
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ScheduleScreen(),
+                            builder: (context) => const SchedulePage(),
                           ),
                         );
                       },

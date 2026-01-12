@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/height.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
 class AgePage extends StatefulWidget {
   const AgePage({super.key});
@@ -12,9 +13,14 @@ class AgePage extends StatefulWidget {
 }
 
 class _AgePageState extends State<AgePage> {
-  int _currentAge = 21;
+  final TextEditingController _ageController = TextEditingController();
+  bool _isInputEmpty = false;
 
-  static const double _barHeight = 99.0;
+  @override
+  void dispose() {
+    _ageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +39,7 @@ class _AgePageState extends State<AgePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Berapa usia kamu?",
+                    "Berapa umur kamu?",
                     style: AppTextStyles.heading3(
                       weight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -41,7 +47,7 @@ class _AgePageState extends State<AgePage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Setiap usia punya kapasitas berbeda, kami sesuaikan latihan buat usia kamu",
+                    "Setiap umur punya kapasitas berbeda, kami sesuaikan latihan buat usia kamu",
                     textAlign: TextAlign.start,
                     style: AppTextStyles.paragraph1(
                       weight: FontWeight.w500,
@@ -52,80 +58,80 @@ class _AgePageState extends State<AgePage> {
               ),
             ),
 
-            const SizedBox(height: 108),
+            const SizedBox(height: 50),
 
-            Column(
-              children: [
-                Text(
-                  "$_currentAge",
-                  style: AppTextStyles.display1(
-                    weight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Icon(Icons.arrow_drop_up, color: Colors.black, size: 90),
-                const SizedBox(height: 16),
-
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      height: _barHeight,
-                      width: double.infinity,
-                      color: AppColors.primary,
-                      child: Center(
-                        child: NumberPicker(
-                          value: _currentAge,
-                          minValue: 10,
-                          maxValue: 99,
-                          step: 1,
-                          axis: Axis.horizontal,
-                          itemWidth: 120,
-
-                          onChanged: (newValue) {
-                            setState(() {
-                              _currentAge = newValue;
-                            });
-                          },
-                          textStyle: AppTextStyles.heading3(
-                            weight: FontWeight.bold,
-                            color: AppColors.textSecondary,
-                          ).copyWith(height: 1.0),
-
-                          selectedTextStyle: AppTextStyles.heading2(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.textSecondary,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: _isInputEmpty ? Colors.red : AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _ageController,
+                            keyboardType: TextInputType.number,
+                            style: AppTextStyles.heading3(
+                              weight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: "Contoh : 25",
+                              hintStyle: AppTextStyles.heading3(
+                                weight: FontWeight.bold,
+                                color: Colors.grey.shade400,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            onChanged: (value) {
+                              if (_isInputEmpty) {
+                                setState(() {
+                                  _isInputEmpty = false;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        Text(
+                          "Tahun",
+                          style: AppTextStyles.heading3(
                             weight: FontWeight.bold,
                             color: AppColors.textPrimary,
-                          ).copyWith(height: 1.0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (_isInputEmpty) ...[
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: Text(
+                        "Isi umur kamu dulu ya",
+                        style: AppTextStyles.paragraph1(
+                          weight: FontWeight.w500,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
-
-                    // Garis Putih
-                    Align(
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 2,
-                            height: _barHeight,
-                            color: AppColors.textSecondary,
-                          ),
-
-                          SizedBox(width: 110),
-
-                          Container(
-                            width: 2,
-                            height: _barHeight,
-                            color: AppColors.textSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
-                ),
-              ],
+                ],
+              ),
             ),
 
             const Spacer(flex: 3),
@@ -140,6 +146,20 @@ class _AgePageState extends State<AgePage> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
+                    if (_ageController.text.isEmpty) {
+                      setState(() {
+                        _isInputEmpty = true;
+                      });
+                      return;
+                    }
+
+                    int? ageValue = int.tryParse(_ageController.text);
+
+                    if (ageValue == null) {
+                      return;
+                    }
+                    context.read<RegistrationProvider>().setAge(ageValue);
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -165,7 +185,7 @@ class _AgePageState extends State<AgePage> {
                 ),
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
           ],
         ),
       ),

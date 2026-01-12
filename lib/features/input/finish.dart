@@ -4,14 +4,14 @@ import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/home.dart';
 
-class FinishScreen extends StatefulWidget {
-  const FinishScreen({super.key});
+class FinishPage extends StatefulWidget {
+  const FinishPage({super.key});
 
   @override
-  State<FinishScreen> createState() => _FinishScreenState();
+  State<FinishPage> createState() => _FinishPageState();
 }
 
-class _FinishScreenState extends State<FinishScreen> {
+class _FinishPageState extends State<FinishPage> {
   late ConfettiController _confettiController;
 
   @override

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/weight.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
 class HeightPage extends StatefulWidget {
   const HeightPage({super.key});
@@ -121,10 +123,13 @@ class _HeightPageState extends State<HeightPage> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
+                        context.read<RegistrationProvider>().setHeight(
+                          _currentHeight.toDouble(),
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const WeightScreen(),
+                            builder: (context) => const WeightPage(),
                           ),
                         );
                       },

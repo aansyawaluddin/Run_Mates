@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/gender.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -327,12 +329,17 @@ class _SignUpState extends State<SignUp> {
                     child: TextButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          Navigator.pushAndRemoveUntil(
+                          context.read<RegistrationProvider>().setAccountData(
+                            _emailController.text.trim(),
+                            _usernameController.text.trim(),
+                            _passwordController.text,
+                          );
+
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const GenderSelectionPage(),
+                              builder: (context) => const GenderPage(),
                             ),
-                            (route) => false,
                           );
                         } else {
                           print("Form tidak valid");

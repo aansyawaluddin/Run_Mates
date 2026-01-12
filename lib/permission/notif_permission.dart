@@ -1,63 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart'; // [IMPORT]
 import 'package:runmates/component/notifikasi.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/finish.dart';
+import 'package:runmates/providers/registration_provider.dart'; // [IMPORT]
 import 'package:runmates/service/notifService.dart';
 
-class NotificationPermissionScreen extends StatelessWidget {
+class NotificationPermissionScreen extends StatefulWidget {
   const NotificationPermissionScreen({super.key});
+
+  @override
+  State<NotificationPermissionScreen> createState() =>
+      _NotificationPermissionScreenState();
+}
+
+class _NotificationPermissionScreenState
+    extends State<NotificationPermissionScreen> {
+  Future<void> _submitAndGoNext(BuildContext context) async {
+    final provider = context.read<RegistrationProvider>();
+
+    String? error = await provider.registerUser();
+
+    if (!mounted) return;
+
+    if (error == null) {
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const FinishPage()));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal mendaftar: $error')));
+    }
+  }
 
   Future<void> _requestNotificationPermission(BuildContext context) async {
     try {
       final result = await Permission.notification.request();
 
       if (result.isGranted) {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Terima kasih — notifikasi diaktifkan')),
         );
 
         await _showTestNotification(context);
 
-        _goToNextPage(context);
+        await _submitAndGoNext(context);
       } else if (result.isPermanentlyDenied) {
+        if (context.mounted) await _submitAndGoNext(context);
       } else {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Izin notifikasi tidak diberikan')),
         );
+        await _submitAndGoNext(context);
       }
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Terjadi error: $e')));
     }
   }
 
-  void _goToNextPage(BuildContext context) {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const FinishScreen()));
-  }
-
   Future<void> _showTestNotification(BuildContext context) async {
     final status = await Permission.notification.status;
-    if (!status.isGranted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Izin notifikasi belum diberikan.')),
-      );
-      return;
-    }
+    if (!status.isGranted) return;
 
     await NotifiService().showNotification(
       100,
       'RunMates',
-      'Program anda sudah dibuat',
+      'Selamat Datang! Akun kamu berhasil dibuat.',
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<RegistrationProvider>();
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -71,7 +93,11 @@ class NotificationPermissionScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => _goToNextPage(context),
+                  onPressed: provider.isLoading
+                      ? null 
+                      : () => _submitAndGoNext(
+                          context,
+                        ), 
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF4B4B4B).withOpacity(0.6),
                     foregroundColor: Colors.white,
@@ -91,8 +117,8 @@ class NotificationPermissionScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
 
+              const SizedBox(height: 30),
               Text(
                 'Aktifkan \nnotifikasi yuk',
                 style: AppTextStyles.heading3(
@@ -100,9 +126,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-
               const SizedBox(height: 12),
-
               Text(
                 'Biar RunMates bisa ingetin kamu tentang latihan kamu',
                 style: AppTextStyles.paragraph1(
@@ -110,18 +134,15 @@ class NotificationPermissionScreen extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-
               const SizedBox(height: 40),
 
-              NotificationCard(
+              const NotificationCard(
                 title: 'Waktunya lari harian kamu',
                 description:
                     'Lari 30 menit aja udah cukup buat jaga kebugaran dan progress menuju target bulanan kamu',
               ),
-
               const SizedBox(height: 16),
-
-              NotificationCard(
+              const NotificationCard(
                 title: 'Tinggal 5 km lagi menuju target kamu!',
                 description:
                     'Lari sebentar hari ini bisa bantu kamu capai target bulanan kamu lho',
@@ -139,9 +160,11 @@ class NotificationPermissionScreen extends StatelessWidget {
                     width: screenWidth * 0.6,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        _requestNotificationPermission(context);
-                      },
+                      onPressed: provider.isLoading
+                          ? null 
+                          : () {
+                              _requestNotificationPermission(context);
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: AppColors.textPrimary,
@@ -150,13 +173,15 @@ class NotificationPermissionScreen extends StatelessWidget {
                         ),
                         elevation: 6,
                       ),
-                      child: Text(
-                        'Lanjutkan',
-                        style: AppTextStyles.button(
-                          weight: FontWeight.bold,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
+                      child: provider.isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Lanjutkan',
+                              style: AppTextStyles.button(
+                                weight: FontWeight.bold,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                     ),
                   ),
                 ),

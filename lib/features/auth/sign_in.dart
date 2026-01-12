@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/home.dart';
+import 'package:runmates/providers/auth_provider.dart';
 
-class SingIn extends StatefulWidget {
-  const SingIn({super.key});
+class SignIn extends StatefulWidget {
+  const SignIn({super.key});
 
   @override
-  State<SingIn> createState() => _SingInState();
+  State<SignIn> createState() => _SignInState();
 }
 
-class _SingInState extends State<SingIn> {
+class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -19,6 +21,8 @@ class _SingInState extends State<SingIn> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.textSecondary,
       body: SafeArea(
@@ -194,21 +198,39 @@ class _SingInState extends State<SingIn> {
                   SizedBox(
                     width: double.infinity,
                     height: 60,
-                    child: TextButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
-                            ),
-                            (route) => false,
-                          );
+                    child: ElevatedButton(
+                      onPressed: authProvider.isLoading
+                          ? null // Disable tombol saat loading
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                String? error = await context
+                                    .read<AuthProvider>()
+                                    .login(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                    );
 
-                          debugPrint('Email: ${_emailController.text}');
-                          debugPrint('Password: ${_passwordController.text}');
-                        }
-                      },
+                                if (context.mounted) {
+                                  if (error == null) {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MainScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(error),
+                                        backgroundColor: AppColors.primary,
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            },
 
                       style: TextButton.styleFrom(
                         backgroundColor: AppColors.primary,

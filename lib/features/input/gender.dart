@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/age.dart';
+import 'package:runmates/providers/registration_provider.dart';
 
-class GenderSelectionPage extends StatefulWidget {
-  const GenderSelectionPage({super.key});
+class GenderPage extends StatefulWidget {
+  const GenderPage({super.key});
 
   @override
-  State<GenderSelectionPage> createState() => _GenderSelectionPageState();
+  State<GenderPage> createState() => _GenderPageState();
 }
 
 enum Gender { male, female }
 
-class _GenderSelectionPageState extends State<GenderSelectionPage> {
+class _GenderPageState extends State<GenderPage> {
   Gender? _selectedGender;
 
   bool _showErrorText = false;
@@ -103,9 +105,17 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                           });
                           return;
                         }
+                        int genderValue = _selectedGender == Gender.male
+                            ? 0
+                            : 1;
+                        context.read<RegistrationProvider>().setGender(
+                          genderValue,
+                        );
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => AgePage()),
+                          MaterialPageRoute(
+                            builder: (context) => const AgePage(),
+                          ),
                         );
                       },
                       style: TextButton.styleFrom(

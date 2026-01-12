@@ -89,7 +89,7 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SingIn()),
+                        MaterialPageRoute(builder: (context) => const SignIn()),
                       );
                     },
                     style: TextButton.styleFrom(
