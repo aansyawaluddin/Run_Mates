@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
-import 'package:runmates/features/main/program_day.dart';
+import 'package:runmates/features/main/program/program_day.dart';
 
 class ProgramWeekPage extends StatelessWidget {
   const ProgramWeekPage({super.key});

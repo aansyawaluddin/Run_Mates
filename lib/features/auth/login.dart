@@ -4,8 +4,8 @@ import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/auth/sign_in.dart';
 import 'package:runmates/features/auth/sign_up.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {

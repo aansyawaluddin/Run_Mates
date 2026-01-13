@@ -1,30 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/auth/login.dart';
-import 'package:runmates/features/main/badge.dart';
-import 'package:runmates/features/main/edit_profile.dart';
+import 'package:runmates/features/main/profile/badge.dart';
+import 'package:runmates/features/main/profile/edit_profile.dart';
+import 'package:runmates/providers/auth_provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthProvider>().loadUserProfile();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0XFFFF5050);
-    const Color textColor = Color(0xFF2D2D2D);
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 20),
-              const Text(
-                "My Profile",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              Text(
+                "Profile",
+                style: AppTextStyles.heading4(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 20),
@@ -33,18 +48,20 @@ class ProfilePage extends StatelessWidget {
                 backgroundColor: Color(0xFFE0E0E0),
               ),
               const SizedBox(height: 15),
-              const Text(
-                "Madison Smith",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
+              Text(
+                user?.fullName ?? "",
+                style: AppTextStyles.heading5(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 5),
-              const Text(
-                "madisons@example.com",
-                style: TextStyle(fontSize: 12, color: Colors.black),
+              Text(
+                user?.email ?? "",
+                style: AppTextStyles.heading4Uppercase(
+                  weight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
               const SizedBox(height: 25),
 
@@ -52,11 +69,11 @@ class ProfilePage extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 decoration: BoxDecoration(
-                  color: primaryColor,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
+                      color: AppColors.primary.withOpacity(0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -65,11 +82,17 @@ class ProfilePage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildStatItem("75", "Weight (Kg)"),
+                    _buildStatItem(
+                      user?.weightKg.toStringAsFixed(1) ?? "-",
+                      "Berat (Kg)",
+                    ),
                     _buildDivider(),
-                    _buildStatItem("28", "Years Old"),
+                    _buildStatItem(user?.age.toString() ?? "-", "Usia"),
                     _buildDivider(),
-                    _buildStatItem("1.65", "Height(CM)"),
+                    _buildStatItem(
+                      user?.heightCm.toStringAsFixed(2) ?? "-",
+                      "Tinggi (CM)",
+                    ),
                   ],
                 ),
               ),
@@ -79,7 +102,7 @@ class ProfilePage extends StatelessWidget {
               _buildMenuItem(
                 icon: Icons.person,
                 text: "Profile",
-                color: primaryColor,
+                color: AppColors.primary,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -92,7 +115,7 @@ class ProfilePage extends StatelessWidget {
               _buildMenuItem(
                 icon: Icons.notifications,
                 text: "Notification Setting",
-                color: primaryColor,
+                color: AppColors.primary,
                 onTap: () {
                   // TODO: navigasi ke pengaturan notifikasi
                 },
@@ -100,10 +123,10 @@ class ProfilePage extends StatelessWidget {
               _buildMenuItem(
                 icon: Icons.logout,
                 text: "Logout",
-                color: primaryColor,
+                color: AppColors.primary,
                 isLogout: true,
                 onTap: () {
-                  _showLogoutConfirmation(context, primaryColor);
+                  _showLogoutConfirmation(context, AppColors.primary);
                 },
               ),
 
@@ -118,10 +141,9 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     Text(
                       "Lencana",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
                     ),
                     GestureDetector(
@@ -163,10 +185,10 @@ class ProfilePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 120, 
-                    width: 100, 
+                    height: 120,
+                    width: 100,
                     child: Image.asset(
-                      'assets/images/lencana.png', 
+                      'assets/images/lencana.png',
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Icon(
@@ -204,11 +226,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   // Modal Logout
-  void _showLogoutConfirmation(BuildContext context, Color primaryColor) {
+  void _showLogoutConfirmation(BuildContext parentContext, Color primaryColor) {
     showModalBottomSheet(
-      context: context,
+      context: parentContext,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (modalContext) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
           decoration: const BoxDecoration(
@@ -236,9 +258,9 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(modalContext),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
+                        backgroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -258,17 +280,22 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(width: 20),
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
-                        );
+                      onPressed: () async {
+                        Navigator.pop(modalContext);
+                        await parentContext.read<AuthProvider>().logout();
+                        if (parentContext.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                            parentContext,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
-                        side: BorderSide(color: primaryColor, width: 1.5),
+                        side: BorderSide(color: AppColors.primary, width: 1.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -278,7 +305,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: primaryColor,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
-import 'package:runmates/features/main/notification.dart';
+import 'package:runmates/features/main/home/notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

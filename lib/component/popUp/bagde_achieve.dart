@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
-import 'package:runmates/features/main/badge.dart';
+import 'package:runmates/features/main/profile/badge.dart';
 
 void shoBagdeAchieve(BuildContext context) {
   showDialog(

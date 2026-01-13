@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
-import 'package:runmates/home.dart';
+import 'package:runmates/main_page.dart';
 
 class FinishPage extends StatefulWidget {
   const FinishPage({super.key});
@@ -133,7 +133,7 @@ class _FinishPageState extends State<FinishPage> {
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MainScreen(),
+                                  builder: (context) => const MainPage(),
                                 ),
                                 (Route<dynamic> route) => false,
                               );

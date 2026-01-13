@@ -72,7 +72,7 @@ class RegistrationProvider extends ChangeNotifier {
         throw 'Gagal membuat user auth.';
       }
 
-      await supabase.from('profiles').insert({
+      await supabase.schema('runmates').from('profiles').insert({
         'id': user.id, 
         'email': email.trim(),
         'full_name': fullName,

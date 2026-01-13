@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:runmates/component/navbar.dart';
-import 'package:runmates/features/main/home.dart';
-import 'package:runmates/features/main/profile.dart';
-import 'package:runmates/features/main/program_week.dart';
+import 'package:runmates/features/main/home/home.dart';
+import 'package:runmates/features/main/profile/profile.dart';
+import 'package:runmates/features/main/program/program_week.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainPageState extends State<MainPage> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
