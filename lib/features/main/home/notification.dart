@@ -2,68 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:runmates/component/notifikasi.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/models/notification_model.dart';
+import 'package:runmates/service/notification_service.dart.dart';
 
-class NotificationPage extends StatelessWidget {
+class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> notifications = [
-      {
-        'date': 'Hari Ini',
-        'items': [
-          {
-            'title': 'Waktunya Lari Harian Kamu',
-            'desc':
-                'Lari 30 menit aja udah cukup buat jaga kebugaran dan progress menuju target bulanan kamu',
-          },
-          {
-            'title': '5 Km Lagi Menuju Target Kamu!',
-            'desc':
-                'Lari sebentar hari ini bisa bantu kamu capai target kamu lho',
-          },
-          {
-            'title': 'Kamu Berhasil Capai Target Mingguan!',
-            'desc': 'Target lari 3x seminggu berhasil! Terus pertahankan ya',
-          },
-        ],
-      },
-      {
-        'date': 'Kemarin',
-        'items': [
-          {
-            'title': 'Waktunya Lari Harian Kamu',
-            'desc':
-                'Lari 30 menit aja udah cukup buat jaga kebugaran dan progress menuju target bulanan kamu',
-          },
-          {
-            'title': '5 Km Lagi Menuju Target Kamu!',
-            'desc':
-                'Lari sebentar hari ini bisa bantu kamu capai target kamu lho',
-          },
-        ],
-      },
-      {
-        'date': '3 Desember 20xx',
-        'items': [
-          {
-            'title': 'Waktunya Lari Harian Kamu',
-            'desc':
-                'Lari 30 menit aja udah cukup buat jaga kebugaran dan progress menuju target bulanan kamu',
-          },
-        ],
-      },
-    ];
+  State<NotificationPage> createState() => _NotificationPageState();
+}
 
+class _NotificationPageState extends State<NotificationPage> {
+  final NotificationService _service = NotificationService();
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.textSecondary,
+
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
+
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
@@ -100,37 +65,69 @@ class NotificationPage extends StatelessWidget {
             ),
 
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final group = notifications[index];
-                  final String dateLabel = group['date'];
-                  final List items = group['items'];
+              child: StreamBuilder<List<NotificationModel>>(
+                stream: _service.getNotificationStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
-                        child: Text(
-                          dateLabel,
-                          style: AppTextStyles.paragraph1(
-                            weight: FontWeight.w500,
-                            color: AppColors.primary,
-                          ),
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Belum ada notifikasi',
+                        style: AppTextStyles.paragraph1(
+                          color: Colors.grey,
+                          weight: FontWeight.normal,
                         ),
                       ),
-                      ...items.map((item) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: NotificationCard(
-                            title: item['title'],
-                            description: item['desc'],
+                    );
+                  }
+
+                  final groupedNotifications = _service
+                      .groupNotificationsByDate(snapshot.data!);
+                  final groupKeys = groupedNotifications.keys.toList();
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    itemCount: groupKeys.length,
+                    itemBuilder: (context, index) {
+                      final String dateLabel = groupKeys[index];
+                      final List<NotificationModel> items =
+                          groupedNotifications[dateLabel]!;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 12.0,
+                              top: 8.0,
+                            ),
+                            child: Text(
+                              dateLabel,
+                              style: AppTextStyles.paragraph1(
+                                weight: FontWeight.w500,
+                                color: AppColors.primary,
+                              ),
+                            ),
                           ),
-                        );
-                      }),
-                    ],
+                          ...items.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: NotificationCard(
+                                title: item.title,
+                                description: item.description,
+                              ),
+                            );
+                          }),
+                        ],
+                      );
+                    },
                   );
                 },
               ),

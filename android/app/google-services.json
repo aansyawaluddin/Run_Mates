@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "449068324494",
+    "project_id": "runmates-825b5",
+    "storage_bucket": "runmates-825b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449068324494:android:d002458d1e64cb58329bdf",
+        "android_client_info": {
+          "package_name": "com.example.runmates"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVlA8yNX39ntpZydDGugVlmA32eVY4isI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

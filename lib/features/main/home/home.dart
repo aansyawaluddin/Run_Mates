@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/home/notification.dart';
+import 'package:runmates/providers/auth_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +24,9 @@ class _HomePageState extends State<HomePage> {
         _currentPage = _pageController.page?.round() ?? 0;
       });
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthProvider>().loadUserProfile();
+    });
   }
 
   @override
@@ -34,11 +39,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final double bottomSpacing = MediaQuery.of(context).padding.bottom;
 
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.currentUser;
+
     return Scaffold(
-      backgroundColor: Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       appBar: AppBar(
         title: Text(
-          'Halo, Runners!',
+          'Halo, ${user?.fullName ?? "User"}!',
           style: AppTextStyles.heading4(
             weight: FontWeight.bold,
             color: AppColors.primary,

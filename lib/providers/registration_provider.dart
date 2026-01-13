@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -5,13 +6,13 @@ class RegistrationProvider extends ChangeNotifier {
   String email = '';
   String password = '';
   String fullName = '';
-  int? gender; 
+  int? gender;
   int age = 0;
   double heightCm = 0.0;
   double weightKg = 0.0;
   double targetDistanceKm = 0.0;
-  int targetTimeMinutes = 0; 
-  List<String> availableDays = []; 
+  int targetTimeMinutes = 0;
+  List<String> availableDays = [];
 
   bool isLoading = false;
 
@@ -58,12 +59,14 @@ class RegistrationProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+
       final supabase = Supabase.instance.client;
 
       final AuthResponse res = await supabase.auth.signUp(
         email: email.trim(),
         password: password,
-        data: {'full_name': fullName}, 
+        data: {'full_name': fullName},
       );
 
       final User? user = res.user;
@@ -73,7 +76,7 @@ class RegistrationProvider extends ChangeNotifier {
       }
 
       await supabase.schema('runmates').from('profiles').insert({
-        'id': user.id, 
+        'id': user.id,
         'email': email.trim(),
         'full_name': fullName,
         'gender': gender,
@@ -82,17 +85,17 @@ class RegistrationProvider extends ChangeNotifier {
         'weight_kg': weightKg,
         'target_distance_km': targetDistanceKm,
         'target_time_minutes': targetTimeMinutes,
-        'available_days': availableDays, 
+        'available_days': availableDays,
+        'fcm_token': fcmToken,
       });
 
       isLoading = false;
       notifyListeners();
-      return null; 
-
+      return null;
     } catch (e) {
       isLoading = false;
       notifyListeners();
-      return e.toString(); 
+      return e.toString();
     }
   }
 }

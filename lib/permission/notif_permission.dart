@@ -6,7 +6,6 @@ import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/input/finish.dart';
 import 'package:runmates/providers/registration_provider.dart';
-import 'package:runmates/service/notifService.dart';
 
 class NotificationPermissionScreen extends StatefulWidget {
   const NotificationPermissionScreen({super.key});
@@ -39,7 +38,7 @@ class _NotificationPermissionScreenState
               borderRadius: BorderRadius.circular(12.0),
             ),
             title: Text(
-              'Gagal Mendaftar', 
+              'Gagal Mendaftar',
               style: AppTextStyles.heading4(
                 weight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -92,7 +91,6 @@ class _NotificationPermissionScreenState
           const SnackBar(content: Text('Terima kasih — notifikasi diaktifkan')),
         );
 
-        await _showTestNotification(context);
         await _submitAndGoNext(context);
       } else if (result.isPermanentlyDenied) {
         if (context.mounted) await _submitAndGoNext(context);
@@ -109,17 +107,6 @@ class _NotificationPermissionScreenState
         context,
       ).showSnackBar(SnackBar(content: Text('Terjadi error: $e')));
     }
-  }
-
-  Future<void> _showTestNotification(BuildContext context) async {
-    final status = await Permission.notification.status;
-    if (!status.isGranted) return;
-
-    await NotifiService().showNotification(
-      100,
-      'RunMates',
-      'Selamat Datang! Akun kamu berhasil dibuat.',
-    );
   }
 
   @override
