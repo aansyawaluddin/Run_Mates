@@ -3,10 +3,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:runmates/features/auth/auth_gate.dart';
 import 'package:runmates/providers/auth_provider.dart';
+import 'package:runmates/providers/profile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:runmates/providers/registration_provider.dart';
 import 'package:runmates/cores/app_theme.dart';
-import 'package:runmates/onboarding_screen.dart';
 import 'package:runmates/service/notifService.dart';
 
 void main() async {
@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => RegistrationProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

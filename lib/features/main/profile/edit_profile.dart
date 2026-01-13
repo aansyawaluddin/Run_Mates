@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
+import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/providers/auth_provider.dart';
+import 'package:runmates/providers/profile_provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -9,8 +13,6 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final Color primaryColor = const Color(0XFFFF5050);
-
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _ageController;
@@ -21,11 +23,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
 
-    _nameController = TextEditingController(text: "Madison Smith");
-    _emailController = TextEditingController(text: "madisons@example.com");
-    _ageController = TextEditingController(text: "21");
-    _weightController = TextEditingController(text: "65 Kg");
-    _heightController = TextEditingController(text: "165 Cm");
+    final user = context.read<AuthProvider>().currentUser;
+
+    _nameController = TextEditingController(text: user?.fullName ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
+    _ageController = TextEditingController(text: user?.age.toString() ?? '');
+    _weightController = TextEditingController(
+      text: user?.weightKg.toString() ?? '',
+    );
+    _heightController = TextEditingController(
+      text: user?.heightCm.toString() ?? '',
+    );
   }
 
   @override
@@ -38,163 +46,268 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final screenWidth = media.size.width;
-    return Scaffold(
-      backgroundColor: Color(0XFFFAFAFA),
-      appBar: AppBar(
-        title: const Text(
-          "My Profile",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+  Future<void> _handleUpdateProfile(ProfileProvider profileProvider) async {
+    if (_nameController.text.trim().isEmpty) return;
+
+    final int age = int.tryParse(_ageController.text) ?? 0;
+    final double weight = double.tryParse(_weightController.text) ?? 0.0;
+    final double height = double.tryParse(_heightController.text) ?? 0.0;
+
+    final String? error = await profileProvider.updateProfile(
+      fullName: _nameController.text.trim(),
+      age: age,
+      weight: weight,
+      height: height,
+    );
+
+    if (!mounted) return;
+
+    if (error == null) {
+      await context.read<AuthProvider>().loadUserProfile();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Berhasil Update!"),
+            backgroundColor: Colors.green,
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFFFAFAFA),
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            margin: const EdgeInsets.only(left: 18),
-            padding: const EdgeInsets.all(3.0),
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: AppColors.textSecondary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Container(
-              padding: const EdgeInsets.all(1.0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: AppColors.primary,
-                size: 20,
+            title: Text(
+              'Gagal Update',
+              style: AppTextStyles.heading4(
+                weight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(color: Color(0XFFFAFAFA)),
-        ),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Madison Smith",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "madisons@example.com",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+            content: Text(
+              error,
+              style: AppTextStyles.heading4Uppercase(
+                weight: FontWeight.normal,
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 20),
-
-            // 2. Statistik Card (Merah)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildStatItem("75", "Weight (Kg)"),
-                  _buildDivider(),
-                  _buildStatItem("28", "Years Old"),
-                  _buildDivider(),
-                  _buildStatItem("1.65", "Height(CM)"),
-                ],
-              ),
-            ),
-            const SizedBox(height: 25),
-
-            // Input
-            _buildInputLabel("Full name"),
-            _buildTextField(_nameController),
-
-            _buildInputLabel("Email"),
-            _buildTextField(_emailController),
-
-            _buildInputLabel("Age"),
-            _buildTextField(_ageController),
-
-            _buildInputLabel("Weight"),
-            _buildTextField(_weightController),
-
-            _buildInputLabel("Height"),
-            _buildTextField(_heightController),
-
-            const SizedBox(height: 30),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32.0,
-                vertical: 24,
-              ),
-              child: SizedBox(
-                width: screenWidth * 0.6,
-                height: 56,
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                height: 45,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0XFFFF5050),
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    elevation: 6,
                   ),
-                  child: const Text(
-                    "Update Profile",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  child: Text(
+                    'Coba Lagi',
+                    style: AppTextStyles.button(
+                      weight: FontWeight.bold,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),
               ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ProfileProvider>(
+      builder: (context, profileProvider, child) {
+        final user = context.watch<AuthProvider>().currentUser;
+        return Scaffold(
+          backgroundColor: AppColors.textSecondary,
+          appBar: AppBar(
+            title: Text(
+              "Profile",
+              style: AppTextStyles.heading4(
+                weight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
+            centerTitle: true,
+            backgroundColor: AppColors.textSecondary,
+            elevation: 0,
+            leading: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                margin: const EdgeInsets.only(left: 18),
+                padding: const EdgeInsets.all(3.0),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(1.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(color: AppColors.textSecondary),
+            ),
+          ),
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: Column(
+                  children: [
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            user?.fullName ?? "",
+                            style: AppTextStyles.heading5(
+                              weight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            user?.email ?? "",
+                            style: AppTextStyles.heading4Uppercase(
+                              weight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 2. Statistik Card (Merah)
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildStatItem(
+                            user?.weightKg.toStringAsFixed(1) ?? "-",
+                            "Berat (Kg)",
+                          ),
+                          _buildDivider(),
+                          _buildStatItem(user?.age.toString() ?? "-", "Usia"),
+                          _buildDivider(),
+                          _buildStatItem(
+                            user?.heightCm.toStringAsFixed(2) ?? "-",
+                            "Tinggi (CM)",
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+
+                    // Input
+                    _buildInputLabel("Nama"),
+                    _buildTextField(_nameController),
+
+                    _buildInputLabel("Email"),
+                    _buildTextField(_emailController, isReadOnly: true),
+
+                    _buildInputLabel("Usia"),
+                    _buildTextField(_ageController, isNumber: true),
+
+                    _buildInputLabel("Berat (Kg)"),
+                    _buildTextField(_weightController, isNumber: true),
+
+                    _buildInputLabel("Tinggi (CM)"),
+                    _buildTextField(_heightController, isNumber: true),
+
+                    const SizedBox(height: 30),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0,
+                        vertical: 24,
+                      ),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: profileProvider.isLoading
+                              ? null
+                              : () {
+                                  _handleUpdateProfile(profileProvider);
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                            shadowColor: AppColors.primary.withOpacity(0.5),
+                          ),
+                          child: const Text(
+                            "Perbaharui Profile",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (profileProvider.isLoading)
+                const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -207,7 +320,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Text(
           label,
           style: TextStyle(
-            color: primaryColor,
+            color: AppColors.primary,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -217,32 +330,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   // Widget Edit Teks
-  Widget _buildTextField(TextEditingController controller) {
+  Widget _buildTextField(
+    TextEditingController controller, {
+    bool isNumber = false,
+    bool isReadOnly = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isReadOnly ? Colors.grey.shade200 : AppColors.textSecondary,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
+          if (!isReadOnly)
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
         ],
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: TextField(
         controller: controller,
+        readOnly: isReadOnly,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         decoration: const InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           isDense: true,
         ),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Colors.black87,
+          color: isReadOnly ? Colors.grey : AppColors.textPrimary,
         ),
       ),
     );
