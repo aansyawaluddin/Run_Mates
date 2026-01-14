@@ -1,12 +1,10 @@
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// Import model yang baru dibuat
 import 'package:runmates/models/notification_model.dart';
 
 class NotificationService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  // 1. Stream sekarang mengembalikan List<NotificationModel>
   Stream<List<NotificationModel>> getNotificationStream() {
     return _client
         .schema('runmates')
@@ -19,8 +17,6 @@ class NotificationService {
         );
   }
 
-  // 2. Grouping data berdasarkan Tanggal
-  // Map value-nya sekarang List<NotificationModel>
   Map<String, List<NotificationModel>> groupNotificationsByDate(
     List<NotificationModel> data,
   ) {
@@ -37,7 +33,6 @@ class NotificationService {
     return grouped;
   }
 
-  // Helper Private
   String _getDateLabel(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
