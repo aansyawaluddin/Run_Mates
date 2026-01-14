@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/cores/app_colors.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -10,14 +11,14 @@ class CustomBottomNav extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
-    this.selectedColor = const Color(0xFFE53935),
-    this.backgroundColor = const Color(0xFFFAFAFA),
+    this.selectedColor = AppColors.primary,
+    this.backgroundColor = AppColors.textSecondary,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 66,
+      height: 75,
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -31,63 +32,63 @@ class CustomBottomNav extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: backgroundColor,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          selectedFontSize: 0,
-          unselectedFontSize: 0,
-          selectedItemColor: selectedColor,
-          unselectedItemColor: const Color(0XFF1A1A1A).withOpacity(0.5),
-          onTap: onTap,
-          elevation: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Icon(
-                  Icons.home_outlined,
-                  size: 30,
-                  color: currentIndex == 0 ? selectedColor : null,
-                ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
+            index: 0,
+            label: "Home",
+          ),
+          _buildNavItem(
+            icon: Icons.list_alt_rounded,
+            activeIcon: Icons.list_alt_rounded,
+            index: 1,
+            label: "Program",
+          ),
+          _buildNavItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person,
+            index: 2,
+            label: "Profile",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required int index,
+    required String label,
+    double yOffset = 0.0,
+    double iconSize = 30.0,
+  }) {
+    final isSelected = currentIndex == index;
+
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 60,
+        width: 60,
+        alignment: Alignment.center,
+        child: Transform.translate(
+          offset: Offset(0, yOffset),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? activeIcon : icon,
+                size: iconSize,
+                color: isSelected
+                    ? selectedColor
+                    : const Color(0XFF1A1A1A).withOpacity(0.5),
               ),
-              activeIcon: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Icon(Icons.home, size: 30, color: selectedColor),
-              ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Icon(
-                  Icons.list_alt_rounded,
-                  size: 30,
-                  color: currentIndex == 1 ? selectedColor : null,
-                ),
-              ),
-              label: 'Program',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Icon(
-                  Icons.person_outline_rounded,
-                  size: 30,
-                  color: currentIndex == 2 ? selectedColor : null,
-                ),
-              ),
-              activeIcon: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Icon(Icons.person, size: 30, color: selectedColor),
-              ),
-              label: 'Profile',
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
