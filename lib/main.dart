@@ -13,10 +13,9 @@ import 'package:runmates/providers/registration_provider.dart';
 import 'package:runmates/cores/app_theme.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', 
-  'High Importance Notifications', 
-  description:
-      'This channel is used for important notifications.',
+  'high_importance_channel',
+  'High Importance Notifications',
+  description: 'This channel is used for important notifications.',
   importance: Importance.max,
   playSound: true,
 );
@@ -50,16 +49,6 @@ void main() async {
       >()
       ?.createNotificationChannel(channel);
 
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  await messaging.requestPermission(alert: true, badge: true, sound: true);
-
-  await messaging.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -76,7 +65,7 @@ void main() async {
             channel.id,
             channel.name,
             channelDescription: channel.description,
-            icon: '@mipmap/launcher_icon', 
+            icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
             // Warna & Getar

@@ -19,7 +19,7 @@ class TipsProvider extends ChangeNotifier {
       notifyListeners();
 
       final response = await Supabase.instance.client
-          .schema('runmates') // Pastikan schema sesuai
+          .schema('runmates')
           .from('tips')
           .select()
           .order('id', ascending: true);

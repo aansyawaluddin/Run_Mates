@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/home/notification.dart';
+import 'package:runmates/features/main/home/tips_detail.dart';
 import 'package:runmates/providers/auth_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
 
@@ -117,9 +118,20 @@ class _HomePageState extends State<HomePage> {
                         itemCount: tipsProvider.tips.length,
                         itemBuilder: (context, index) {
                           final tip = tipsProvider.tips[index];
-                          return tipsCardPage(
-                            imageUrl: tip.imageUrl,
-                            title: tip.title,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TipsDetail(tip: tip),
+                                ),
+                              );
+                            },
+                            child: tipsCardPage(
+                              imageUrl: tip.imageUrl,
+                              title: tip.title,
+                            ),
                           );
                         },
                       ),
