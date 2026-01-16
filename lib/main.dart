@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Import Baru
 import 'package:runmates/features/auth/auth_gate.dart';
+import 'package:runmates/providers/achievement_provider.dart';
 import 'package:runmates/providers/auth_provider.dart';
 import 'package:runmates/providers/profile_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
@@ -97,6 +98,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => TipsProvider()),
+        ChangeNotifierProvider(create: (_) => AchievementProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

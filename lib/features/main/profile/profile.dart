@@ -5,6 +5,7 @@ import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/auth/login.dart';
 import 'package:runmates/features/main/profile/badge.dart';
 import 'package:runmates/features/main/profile/edit_profile.dart';
+import 'package:runmates/providers/achievement_provider.dart';
 import 'package:runmates/providers/auth_provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -20,12 +21,14 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthProvider>().loadUserProfile();
+      context.read<AchievementProvider>().fetchProfileAchievements();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final achievementProvider = context.watch<AchievementProvider>();
     final user = authProvider.currentUser;
 
     return Scaffold(
@@ -181,42 +184,76 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 15),
 
               // Badge
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 120,
-                    width: 100,
-                    child: Image.asset(
-                      'assets/images/lencana.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.shield,
-                          size: 80,
-                          color: Colors.grey,
+              if (achievementProvider.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (achievementProvider.myAchievements.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    "Belum ada lencana yang didapatkan.\nAyo mulai lari!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 120, 
+                  child: Center(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: achievementProvider.myAchievements.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 20),
+                      itemBuilder: (context, index) {
+                        final item = achievementProvider.myAchievements[index];
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: 90,
+                              width: 80,
+                              child: Image.network(
+                                item.achievement.imageUrl,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.shield,
+                                    size: 60,
+                                    color: Colors.grey,
+                                  );
+                                },
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            SizedBox(
+                              width: 80,
+                              child: Text(
+                                item.achievement.title,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  SizedBox(
-                    height: 120,
-                    width: 100,
-                    child: Image.asset(
-                      'assets/images/lencana.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.shield,
-                          size: 80,
-                          color: Colors.grey,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                ),
               const SizedBox(height: 10),
             ],
           ),
