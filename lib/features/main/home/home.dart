@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/home/notification.dart';
+import 'package:runmates/features/main/home/tips_detail.dart';
 import 'package:runmates/providers/auth_provider.dart';
+import 'package:runmates/providers/tips_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthProvider>().loadUserProfile();
+      context.read<TipsProvider>().fetchTips();
     });
   }
 
@@ -41,6 +44,7 @@ class _HomePageState extends State<HomePage> {
 
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.currentUser;
+    final tipsProvider = context.watch<TipsProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.textSecondary,
@@ -84,29 +88,58 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const SizedBox(height: 10),
-              // Carousel Tips
-              SizedBox(
-                height: 200,
-                child: PageView(
-                  controller: _pageController,
+              if (tipsProvider.isLoading)
+                const SizedBox(
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (tipsProvider.errorMessage != null)
+                Container(
+                  height: 200,
+                  alignment: Alignment.center,
+                  child: Text(tipsProvider.errorMessage!),
+                )
+              else if (tipsProvider.tips.isEmpty)
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Center(child: Text('Belum ada tips saat ini')),
+                )
+              else
+                Column(
                   children: [
-                    tipsCardPage(
-                      imagePath: 'assets/images/running_tips.png',
-                      text: 'Half Marathon event held by Mandiri Bank Group',
+                    SizedBox(
+                      height: 200,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: tipsProvider.tips.length,
+                        itemBuilder: (context, index) {
+                          final tip = tipsProvider.tips[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TipsDetail(tip: tip),
+                                ),
+                              );
+                            },
+                            child: tipsCardPage(
+                              imageUrl: tip.imageUrl,
+                              title: tip.title,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    tipsCardPage(
-                      imagePath: 'assets/images/running_tips.png',
-                      text: 'Tips Nutrisi Penting Sebelum Lari Jarak Jauh',
-                    ),
-                    tipsCardPage(
-                      imagePath: 'assets/images/running_tips.png',
-                      text: 'Cara Memilih Sepatu Lari yang Tepat Untukmu',
-                    ),
+                    const SizedBox(height: 12),
+                    _buildPageIndicator(tipsProvider.tips.length),
                   ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              _buildPageIndicator(),
               const SizedBox(height: 24),
 
               // card latihan hari ini
@@ -128,7 +161,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card tips
-  Widget tipsCardPage({required String imagePath, required String text}) {
+  Widget tipsCardPage({required String imageUrl, required String title}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
       child: ClipRRect(
@@ -136,7 +169,14 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            Image.asset(imagePath, fit: BoxFit.cover),
+            Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey,
+                child: const Icon(Icons.broken_image, color: Colors.white),
+              ),
+            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -168,11 +208,13 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Flexible(
                         child: Text(
-                          text,
+                          title,
                           style: AppTextStyles.paragraph1(
                             weight: FontWeight.w500,
                             color: AppColors.textSecondary,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const Icon(
@@ -191,9 +233,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // indikator corousel tips
-  Widget _buildPageIndicator() {
-    int numPages = 3;
+  Widget _buildPageIndicator(int numPages) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(numPages, (index) {

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart'; 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -83,22 +84,47 @@ class _NotificationPermissionScreenState
 
   Future<void> _requestNotificationPermission(BuildContext context) async {
     try {
-      final result = await Permission.notification.request();
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-      if (result.isGranted) {
-        if (!context.mounted) return;
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+
+      if (!context.mounted) return;
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        // Izin Diberikan
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Terima kasih — notifikasi diaktifkan')),
         );
 
-        await _submitAndGoNext(context);
-      } else if (result.isPermanentlyDenied) {
-        if (context.mounted) await _submitAndGoNext(context);
-      } else {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Izin notifikasi tidak diberikan')),
+        await messaging.setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
         );
+
+        await _submitAndGoNext(context);
+      } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        // Izin Ditolak
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Izin notifikasi ditolak.'),
+            action: SnackBarAction(
+              label: 'Buka Setting',
+              onPressed: () =>
+                  openAppSettings(), 
+            ),
+          ),
+        );
+        await _submitAndGoNext(context);
+      } else {
         await _submitAndGoNext(context);
       }
     } catch (e) {
@@ -106,6 +132,7 @@ class _NotificationPermissionScreenState
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Terjadi error: $e')));
+      await _submitAndGoNext(context);
     }
   }
 
