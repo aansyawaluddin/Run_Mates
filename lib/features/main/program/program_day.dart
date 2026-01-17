@@ -1,40 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/program/detail_program.dart';
+import 'package:runmates/providers/prgram_provider.dart';
 
-class ProgramDayPage extends StatelessWidget {
+class ProgramDayPage extends StatefulWidget {
   final int weekNumber;
   final int totalWeeks;
+  final int weekId;
 
   const ProgramDayPage({
     super.key,
     required this.weekNumber,
     required this.totalWeeks,
+    required this.weekId,
   });
 
-  final List<Map<String, dynamic>> dailyWorkouts = const [
-    {'day': 'Senin', 'title': 'Easy Run', 'isCompleted': true},
-    {'day': 'Selasa', 'title': 'Short Train', 'isCompleted': false},
-    {'day': 'Rabu', 'title': 'Tempo Run', 'isCompleted': false},
-    {'day': 'Kamis', 'title': 'Interval Run', 'isCompleted': false},
-    {'day': 'Jumat', 'title': 'Interval Run', 'isCompleted': false},
-    {'day': 'Sabtu', 'title': 'Interval Run', 'isCompleted': false},
-    {'day': 'Minggu', 'title': 'Interval Run', 'isCompleted': false},
-  ];
+  @override
+  State<ProgramDayPage> createState() => _ProgramDayPageState();
+}
+
+class _ProgramDayPageState extends State<ProgramDayPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProgramProvider>(context, listen: false)
+          .fetchDailySchedules(widget.weekId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
+      backgroundColor: AppColors.textSecondary,
       body: SafeArea(
         child: Column(
           children: [
+
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32.0,
-                vertical: 18.0,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 18.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -60,12 +66,10 @@ class ProgramDayPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 60),
-
                   Expanded(
                     child: Text(
-                      'Pekan $weekNumber dari $totalWeeks',
+                      'Pekan ${widget.weekNumber} dari ${widget.totalWeeks}',
                       style: AppTextStyles.heading4(
                         weight: FontWeight.bold,
                         color: AppColors.primary,
@@ -76,26 +80,37 @@ class ProgramDayPage extends StatelessWidget {
               ),
             ),
 
-            // List latihan
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32.0,
-                  vertical: 8.0,
-                ),
-                itemCount: dailyWorkouts.length,
-                itemBuilder: (context, index) {
-                  final workout = dailyWorkouts[index];
-                  return _buildWorkoutCard(
-                    context: context,
-                    day: workout['day'] as String,
-                    title: workout['title'] as String,
-                    isCompleted: workout['isCompleted'] as bool,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ProgramDetailPage(),
-                        ),
+              child: Consumer<ProgramProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isDayLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (provider.dailySchedules.isEmpty) {
+                    return const Center(child: Text("Tidak ada jadwal latihan."));
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                    itemCount: provider.dailySchedules.length,
+                    itemBuilder: (context, index) {
+                      final schedule = provider.dailySchedules[index];
+                      
+                      return _buildWorkoutCard(
+                        context: context,
+                        day: schedule.dayName,
+                        title: schedule.workoutTitle,
+                        isCompleted: schedule.isDone,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProgramDetailPage(
+                                schedule: schedule, 
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
@@ -115,6 +130,8 @@ class ProgramDayPage extends StatelessWidget {
     required bool isCompleted,
     required VoidCallback onTap,
   }) {
+    // ... (KODE _buildWorkoutCard SAMA SEPERTI SEBELUMNYA) ...
+    // Copy-Paste kode UI card Anda di sini
     final Color cardColor = isCompleted ? AppColors.primary : Colors.white;
     final Color textColor = isCompleted ? Colors.white : AppColors.primary;
     final Border? border = isCompleted

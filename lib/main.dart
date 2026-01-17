@@ -8,6 +8,7 @@ import 'package:runmates/features/auth/auth_gate.dart';
 import 'package:runmates/providers/achievement_provider.dart';
 import 'package:runmates/providers/auth_provider.dart';
 import 'package:runmates/providers/profile_provider.dart';
+import 'package:runmates/providers/prgram_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:runmates/providers/registration_provider.dart';
@@ -99,6 +100,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => TipsProvider()),
         ChangeNotifierProvider(create: (_) => AchievementProvider()),
+        ChangeNotifierProvider(create: (_) => ProgramProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

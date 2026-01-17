@@ -7,6 +7,7 @@ class AITrainingService {
   final SupabaseClient supabase = Supabase.instance.client;
 
   final String apiKey = dotenv.env['OPEN_ROUTER_API_KEY'] ?? '';
+
   final String model = 'meta-llama/llama-3.3-70b-instruct:free';
 
   Future<void> generateAndSavePlan({
@@ -18,43 +19,53 @@ class AITrainingService {
   }) async {
     final String prompt =
         '''
-      Berperanlah sebagai Pelatih Lari Profesional. Buat jadwal lari 5 minggu yang sangat detail.
+      Berperanlah sebagai Pelatih Lari. Buat jadwal lari 5 minggu.
       
       DATA ATLET:
       - Profil: $userProfile
       - Target: $targetDistance km dalam $targetTime menit.
-      - Hari Lari Tersedia: ${availableDays.join(', ')}.
+      - Hari Lari (Active Days): ${availableDays.join(', ')}.
       
-      ATURAN PENJADWALAN:
-      1. Program harus progresif (makin lama makin berat) selama 5 minggu.
-      2. HANYA jadwalkan lari di "Hari Lari Tersedia". 
-      3. Hari yang TIDAK dipilih user WAJIB diisi "Rest Day" atau "Strength Training".
-      4. Minggu ke-5 adalah Race Week (tapering/pengurangan volume).
+      ATURAN WAJIB:
+      1. Program progresif 5 minggu.
+      2. Setiap minggu HARUS memuat output data untuk 7 HARI (Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu) secara berurutan.
+      3. Jika hari tersebut ada di "Hari Lari", berikan menu lari (Easy Run, Interval, dll).
+      4. Jika hari tersebut TIDAK ada di "Hari Lari", WAJIB isi "title": "Rest Day" atau "Strength Training".
+      5. Untuk Rest Day, isi duration: 0 dan steps kosong.
+      6. Minggu 5 = Race Week.
       
-      FORMAT OUTPUT WAJIB JSON (ARRAY):
+      OUTPUT JSON (ARRAY):
       [
         {
           "week": 1,
           "days": [
             {
               "day": "Senin",
-              "title": "Judul Latihan (misal: Speed Run / Rest Day)",
-              "subtitle": "Subjudul (misal: Interval 400m / Pemulihan)",
-              "objective": "Tujuan latihan singkat",
+              "title": "Rest Day",
+              "subtitle": "Recovery",
+              "objective": "Istirahat total",
+              "duration": 0,
+              "steps": {}
+            },
+            {
+              "day": "Selasa",
+              "title": "Speed Run",
+              "subtitle": "Interval",
+              "objective": "Tujuan singkat",
               "duration": 45,
-              "steps": {
-                 "warmup": "pemanasan...", 
-                 "main": "menu utama...", 
-                 "cooldown": "pendinginan..."
-              }
+              "steps": {"warmup": "...", "main": "...", "cooldown": "..."}
             }
-            ... (ulangi untuk Selasa sampai Minggu)
+            ... (lanjutkan sampai Minggu lengkap 7 hari)
           ]
         },
-        ... (ulangi sampai week 5)
+        ... (lanjutkan sampai week 5)
       ]
       
-      JANGAN gunakan markdown ```json. Langsung mulai dengan kurung siku [ dan akhiri dengan ].
+      PENTING: 
+      - Pastikan SETIAP minggu memiliki array "days" berisi tepat 7 item (Senin-Minggu).
+      - Isi "steps" dengan RINGKAS padat dan jelas.
+      - Pastikan JSON valid dan LENGKAP sampai penutup kurung siku.
+      - JANGAN gunakan markdown.
     ''';
 
     try {
@@ -72,16 +83,22 @@ class AITrainingService {
             {
               "role": "system",
               "content":
-                  "You are a professional running coach API that outputs strictly valid JSON arrays without markdown formatting.",
+                  "You are a coach API that outputs strictly valid JSON arrays.",
             },
             {"role": "user", "content": prompt},
           ],
           "temperature": 0.7,
+          "max_tokens": 4000,
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+        if (data['choices'] == null || data['choices'].isEmpty) {
+          throw 'AI response empty.';
+        }
+
         String content = data['choices'][0]['message']['content'];
 
         content = content
@@ -89,7 +106,9 @@ class AITrainingService {
             .replaceAll('```', '')
             .trim();
 
-        print("AI Response: $content");
+        if (content.length > 50) {
+          print("JSON End Check: ...${content.substring(content.length - 50)}");
+        }
 
         List<dynamic> weeksData = jsonDecode(content);
 
@@ -103,7 +122,7 @@ class AITrainingService {
                 'user_id': userId,
                 'week_number': weekNum,
                 'title': weekNum == 5 ? 'Race Week' : 'Training Phase',
-                'description': 'Minggu ke-$weekNum menuju targetmu.',
+                'description': 'Minggu ke-$weekNum.',
               })
               .select()
               .single();
@@ -132,6 +151,13 @@ class AITrainingService {
               .from('daily_schedules')
               .insert(dailyInserts);
         }
+        await supabase
+            .schema('runmates')
+            .from('profiles')
+            .update({'is_plan_ready': true})
+            .eq('id', userId);
+
+        print("Jadwal sukses dibuat & status diupdate!");
       } else {
         throw 'OpenRouter Error (${response.statusCode}): ${response.body}';
       }

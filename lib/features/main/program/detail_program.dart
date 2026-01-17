@@ -5,9 +5,15 @@ import 'package:runmates/component/popUp/finish_confirmation.dart';
 import 'package:runmates/component/popUp/finish_popup.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/models/daily_schedule_model.dart';
 
 class ProgramDetailPage extends StatefulWidget {
-  const ProgramDetailPage({super.key});
+
+  final DailyScheduleModel schedule;
+const ProgramDetailPage({
+    super.key, 
+    required this.schedule,
+  });
 
   @override
   State<ProgramDetailPage> createState() => _ProgramDetailPageState();
