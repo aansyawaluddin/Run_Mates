@@ -6,9 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AITrainingService {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  final String apiKey = dotenv.env['OPEN_ROUTER_API_KEY'] ?? '';
+  String get apiKey => dotenv.env['AI_API_KEY'] ?? '';
 
-  final String model = 'meta-llama/llama-3.3-70b-instruct:free';
+  final String model = 'gemini-2.5-pro';
 
   Future<void> generateAndSavePlan({
     required String userId,
@@ -17,152 +17,198 @@ class AITrainingService {
     required int targetTime,
     required String userProfile,
   }) async {
+    if (apiKey.isEmpty) throw 'API Key tidak ditemukan di .env';
+    if (availableDays.isEmpty) throw 'Hari latihan tidak boleh kosong.';
+
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime programStartDate;
+
+    if (today.weekday == DateTime.monday) {
+      programStartDate = today;
+    } else {
+      int daysToAdd = 8 - today.weekday;
+      programStartDate = today.add(Duration(days: daysToAdd));
+    }
+
+    final Map<String, int> dayOffsets = {
+      'Senin': 0,
+      'Selasa': 1,
+      'Rabu': 2,
+      'Kamis': 3,
+      'Jumat': 4,
+      'Sabtu': 5,
+      'Minggu': 6,
+    };
+
     final String prompt =
         '''
-      Berperanlah sebagai Pelatih Lari. Buat jadwal lari 5 minggu.
-      
+      Berperanlah sebagai Pelatih Lari Maraton Profesional.
+      Buat jadwal latihan 5 minggu yang SANGAT DETAIL dan TERSTRUKTUR dalam format JSON.
+
       DATA ATLET:
       - Profil: $userProfile
       - Target: $targetDistance km dalam $targetTime menit.
-      - Hari Lari (Active Days): ${availableDays.join(', ')}.
-      
-      ATURAN WAJIB:
-      1. Program progresif 5 minggu.
-      2. Setiap minggu HARUS memuat output data untuk 7 HARI (Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu) secara berurutan.
-      3. Jika hari tersebut ada di "Hari Lari", berikan menu lari (Easy Run, Interval, dll).
-      4. Jika hari tersebut TIDAK ada di "Hari Lari", WAJIB isi "title": "Rest Day" atau "Strength Training".
-      5. Untuk Rest Day, isi duration: 0 dan steps kosong.
-      6. Minggu 5 = Race Week.
-      
-      OUTPUT JSON (ARRAY):
+      - HARI LARI TERSEDIA: ${availableDays.join(', ')}.
+      - JUMLAH HARI LARI: ${availableDays.length} Hari.
+
+      ATURAN JSON (WAJIB):
+      1. Output HANYA JSON Array.
+      2. Key "day" HARUS: "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu".
+      3. Pastikan setiap objek hari memiliki key: "title", "subtitle", "objective", "duration", dan "steps" (warmup, main, cooldown).
+
+      LOGIKA PENJADWALAN:
+      - Jika <= 2 hari: Fokus Speed & Long Run.
+      - Jika 3 hari: Interval, Easy, Long Run.
+      - Jika > 3 hari: Tambahkan Easy Run (Zone 2).
+      - Hari kosong diisi: Rest Day / Strength Training.
+
+      FORMAT OUTPUT WAJIB (JSON ARRAY):
       [
         {
           "week": 1,
           "days": [
             {
               "day": "Senin",
-              "title": "Rest Day",
-              "subtitle": "Recovery",
-              "objective": "Istirahat total",
-              "duration": 0,
-              "steps": {}
+              "title": "Speed Interval",
+              "subtitle": "VO2 Max",
+              "objective": "Meningkatkan kecepatan.",
+              "duration": 60,
+              "steps": {
+                 "warmup": "Jogging 10 menit",
+                 "main": "5km run",
+                 "cooldown": "Jalan 5 menit"
+              }
             },
-            {
-              "day": "Selasa",
-              "title": "Speed Run",
-              "subtitle": "Interval",
-              "objective": "Tujuan singkat",
-              "duration": 45,
-              "steps": {"warmup": "...", "main": "...", "cooldown": "..."}
-            }
-            ... (lanjutkan sampai Minggu lengkap 7 hari)
+            ... (LENGKAPI 7 HARI SENIN-MINGGU)
           ]
         },
-        ... (lanjutkan sampai week 5)
+        ... (ULANGI SAMPAI MINGGU 5)
       ]
-      
-      PENTING: 
-      - Pastikan SETIAP minggu memiliki array "days" berisi tepat 7 item (Senin-Minggu).
-      - Isi "steps" dengan RINGKAS padat dan jelas.
-      - Pastikan JSON valid dan LENGKAP sampai penutup kurung siku.
-      - JANGAN gunakan markdown.
     ''';
 
     try {
+      print("Mengirim request ke Google AI Studio...");
+
+      final url = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
+      );
+
       final response = await http.post(
-        Uri.parse('https://openrouter.ai/api/v1/chat/completions'),
-        headers: {
-          'Authorization': 'Bearer $apiKey',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://runmates.app',
-          'X-Title': 'RunMates App',
-        },
+        url,
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "model": model,
-          "messages": [
+          "contents": [
             {
-              "role": "system",
-              "content":
-                  "You are a coach API that outputs strictly valid JSON arrays.",
+              "parts": [
+                {"text": prompt},
+              ],
             },
-            {"role": "user", "content": prompt},
           ],
-          "temperature": 0.7,
-          "max_tokens": 4000,
+          "generationConfig": {
+            "temperature": 0.5,
+            "responseMimeType": "application/json",
+          },
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        if (data['choices'] == null || data['choices'].isEmpty) {
-          throw 'AI response empty.';
+        if (data['candidates'] == null ||
+            (data['candidates'] as List).isEmpty) {
+          throw 'AI tidak memberikan jawaban.';
         }
 
-        String content = data['choices'][0]['message']['content'];
+        String content = data['candidates'][0]['content']['parts'][0]['text'];
 
-        content = content
-            .replaceAll('```json', '')
-            .replaceAll('```', '')
-            .trim();
+        // Bersihkan Markdown
+        content = content.replaceAll(
+          RegExp(r'```json', caseSensitive: false),
+          '',
+        );
+        content = content.replaceAll(RegExp(r'```'), '');
 
-        if (content.length > 50) {
-          print("JSON End Check: ...${content.substring(content.length - 50)}");
+        int startIndex = content.indexOf('[');
+        int endIndex = content.lastIndexOf(']');
+
+        if (startIndex == -1 || endIndex == -1) {
+          print("Raw Content: $content");
+          throw 'Format JSON rusak atau tidak ditemukan.';
         }
 
-        List<dynamic> weeksData = jsonDecode(content);
+        String jsonString = content.substring(startIndex, endIndex + 1);
+        List<dynamic> weeksData = jsonDecode(jsonString);
+
+        print("JSON Valid! Menyimpan ke Supabase...");
 
         for (var weekItem in weeksData) {
           int weekNum = weekItem['week'];
+          int weekIndex = weekNum - 1;
 
+          // Insert Program Weeks
           final weekRes = await supabase
               .schema('runmates')
               .from('program_weeks')
               .insert({
                 'user_id': userId,
                 'week_number': weekNum,
-                'title': weekNum == 5 ? 'Race Week' : 'Training Phase',
+                'title': weekNum == 5 ? 'Race Week' : 'Phase $weekNum',
                 'description': 'Minggu ke-$weekNum.',
               })
               .select()
               .single();
 
           final int weekId = weekRes['id'];
-
           List<Map<String, dynamic>> dailyInserts = [];
           List<dynamic> days = weekItem['days'];
 
           for (var dayItem in days) {
+            final Map<String, dynamic> steps = dayItem['steps'] is Map
+                ? dayItem['steps']
+                : {'instruction': 'Lihat deskripsi.'};
+
+            String dayNameAI = dayItem['day'] ?? 'Senin';
+
+            int dayOffset = dayOffsets[dayNameAI] ?? 0;
+            DateTime scheduledDate = programStartDate.add(
+              Duration(days: (weekIndex * 7) + dayOffset),
+            );
+
+            String dateString =
+                "${scheduledDate.year}-${scheduledDate.month.toString().padLeft(2, '0')}-${scheduledDate.day.toString().padLeft(2, '0')}";
+
             dailyInserts.add({
               'week_id': weekId,
               'user_id': userId,
-              'day_name': dayItem['day'],
-              'workout_title': dayItem['title'],
+              'scheduled_date': dateString,
+              'workout_title': dayItem['title'] ?? 'Rest',
               'workout_subtitle': dayItem['subtitle'] ?? '',
               'workout_objective': dayItem['objective'] ?? '',
               'duration_minutes': dayItem['duration'] ?? 0,
-              'steps': dayItem['steps'] ?? {},
+              'steps': steps,
               'is_done': false,
             });
           }
 
-          await supabase
-              .schema('runmates')
-              .from('daily_schedules')
-              .insert(dailyInserts);
+          if (dailyInserts.isNotEmpty) {
+            await supabase
+                .schema('runmates')
+                .from('daily_schedules')
+                .insert(dailyInserts);
+          }
         }
+
         await supabase
             .schema('runmates')
             .from('profiles')
             .update({'is_plan_ready': true})
             .eq('id', userId);
-
-        print("Jadwal sukses dibuat & status diupdate!");
       } else {
-        throw 'OpenRouter Error (${response.statusCode}): ${response.body}';
+        throw 'Google AI Error (${response.statusCode}): ${response.body}';
       }
     } catch (e) {
-      print('Error AI Generator: $e');
+      print('CRITICAL ERROR AI SERVICE: $e');
       rethrow;
     }
   }

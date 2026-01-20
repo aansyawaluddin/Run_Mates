@@ -8,7 +8,7 @@ Future<void> showFinishPopUp(BuildContext context) {
     barrierDismissible: true,
     barrierColor: Colors.transparent,
     builder: (BuildContext dialogContext) {
-      Future.delayed(const Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 2), () {
         Navigator.of(dialogContext).pop();
       });
 

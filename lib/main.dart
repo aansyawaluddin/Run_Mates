@@ -70,7 +70,6 @@ void main() async {
             icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
-            // Warna & Getar
             enableVibration: true,
           ),
         ),

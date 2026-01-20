@@ -130,8 +130,6 @@ class _ProgramDayPageState extends State<ProgramDayPage> {
     required bool isCompleted,
     required VoidCallback onTap,
   }) {
-    // ... (KODE _buildWorkoutCard SAMA SEPERTI SEBELUMNYA) ...
-    // Copy-Paste kode UI card Anda di sini
     final Color cardColor = isCompleted ? AppColors.primary : Colors.white;
     final Color textColor = isCompleted ? Colors.white : AppColors.primary;
     final Border? border = isCompleted
@@ -176,7 +174,7 @@ class _ProgramDayPageState extends State<ProgramDayPage> {
                   const SizedBox(height: 4),
                   Text(
                     title,
-                    style: AppTextStyles.heading3(
+                    style: AppTextStyles.heading4(
                       weight: FontWeight.bold,
                       color: textColor,
                     ),

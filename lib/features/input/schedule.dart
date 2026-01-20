@@ -121,6 +121,22 @@ class _SchedulePageState extends State<SchedulePage> {
                             });
                             return;
                           }
+
+                          if (_selectedDays.length < 2) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Minimal pilih 2 hari agar program lari efektif!",
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                backgroundColor: AppColors.primary,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
                           context.read<RegistrationProvider>().setSchedule(
                             _selectedDays.toList(),
                           );
