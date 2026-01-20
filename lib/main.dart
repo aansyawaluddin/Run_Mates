@@ -3,11 +3,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Import Baru
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'; 
 import 'package:runmates/features/auth/auth_gate.dart';
 import 'package:runmates/providers/achievement_provider.dart';
 import 'package:runmates/providers/auth_provider.dart';
 import 'package:runmates/providers/profile_provider.dart';
+import 'package:runmates/providers/prgram_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:runmates/providers/registration_provider.dart';
@@ -69,7 +70,6 @@ void main() async {
             icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
-            // Warna & Getar
             enableVibration: true,
           ),
         ),
@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => TipsProvider()),
         ChangeNotifierProvider(create: (_) => AchievementProvider()),
+        ChangeNotifierProvider(create: (_) => ProgramProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:runmates/component/bagde.dart';
+import 'package:provider/provider.dart';
 import 'package:runmates/component/popUp/bagde_achieve.dart';
 import 'package:runmates/component/popUp/finish_confirmation.dart';
 import 'package:runmates/component/popUp/finish_popup.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
+import 'package:runmates/models/daily_schedule_model.dart';
+import 'package:runmates/providers/prgram_provider.dart';
 
 class ProgramDetailPage extends StatefulWidget {
-  const ProgramDetailPage({super.key});
+  final DailyScheduleModel schedule;
+  const ProgramDetailPage({super.key, required this.schedule});
 
   @override
   State<ProgramDetailPage> createState() => _ProgramDetailPageState();
@@ -15,10 +18,73 @@ class ProgramDetailPage extends StatefulWidget {
 
 class _ProgramDetailPageState extends State<ProgramDetailPage> {
   bool _isFinished = false;
+  bool _isToday = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFinished = widget.schedule.isDone;
+    final now = DateTime.now();
+    final scheduleDate = widget.schedule.scheduledDate;
+
+    _isToday =
+        now.year == scheduleDate.year &&
+        now.month == scheduleDate.month &&
+        now.day == scheduleDate.day;
+  }
+
+  Future<void> _handleFinishWorkout(BuildContext context) async {
+    final provider = Provider.of<ProgramProvider>(context, listen: false);
+
+    final bool hasBadgeBefore = await provider.hasAchievement(1);
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return FinishConfirmation(
+          onConfirm: () async {
+            try {
+              await provider.markScheduleAsDone(widget.schedule.id);
+
+              if (!mounted) return;
+
+              setState(() {
+                _isFinished = true;
+              });
+
+              await showFinishPopUp(context);
+
+              if (!hasBadgeBefore) {
+                await Future.delayed(const Duration(milliseconds: 500));
+
+                if (!mounted) return;
+                final bool hasBadgeAfter = await provider.hasAchievement(1);
+
+                if (hasBadgeAfter) {
+                  if (!mounted) return;
+                  shoBagdeAchieve(context);
+                }
+              }
+            } catch (e) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+            }
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final parentContext = context;
+    final Map<String, dynamic> steps = widget.schedule.steps;
+    final String? warmup = steps['warmup'];
+    final String? main = steps['main'];
+    final String? cooldown = steps['cooldown'];
+
     return Scaffold(
       backgroundColor: AppColors.textSecondary,
       body: SafeArea(
@@ -99,18 +165,20 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'EASY RUN',
-                              style: AppTextStyles.heading1(
+                              widget.schedule.workoutTitle.toUpperCase(),
+                              style: AppTextStyles.heading3(
                                 weight: FontWeight.bold,
                                 color: AppColors.primary,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                             Text(
-                              'Daya Tahan Dasar',
+                              widget.schedule.workoutSubtitle,
                               style: AppTextStyles.heading4(
                                 weight: FontWeight.w500,
                                 color: AppColors.textSecondary,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
@@ -121,14 +189,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
               ),
               const SizedBox(height: 20),
 
-              // Deskripsi Utama
-              Text(
-                'Easy run adalah Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum. Ut pharetra orci vitae massa mattis ornare. Vivamus nec pulvinar magna.',
-                style: AppTextStyles.paragraph2(color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 25),
-
-              // Tujuan Latihan
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -154,7 +214,7 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
+                          widget.schedule.workoutObjective!,
                           style: AppTextStyles.paragraph2(
                             color: AppColors.textPrimary,
                           ),
@@ -166,7 +226,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
               ),
               const SizedBox(height: 18),
 
-              // Durasi
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
@@ -189,7 +248,7 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                     const SizedBox(width: 82),
 
                     Text(
-                      '40 menit',
+                      '${widget.schedule.durationMinutes} menit',
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 20,
@@ -201,81 +260,65 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
               ),
               const SizedBox(height: 30),
 
-              // Langkah-langkah Header
-              Row(
-                children: [
-                  const Icon(
-                    Icons.double_arrow_rounded,
-                    color: AppColors.primary,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Langkah-langkah',
-                    style: AppTextStyles.heading5(
-                      weight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+              if (steps.isNotEmpty) ...[
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.double_arrow_rounded,
+                      color: AppColors.primary,
+                      size: 28,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Langkah-langkah',
+                      style: AppTextStyles.heading5(
+                        weight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
 
-              // List Langkah-langkah
-              _buildStepCard(
-                title: '1. Pemanasan',
-                duration: '(5 Menit)',
-                description:
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-                iconPath: 'assets/icons/warmup_icon.png',
-                fallbackIcon: Icons.accessibility_new,
-              ),
-              _buildStepCard(
-                title: '2. Lari',
-                duration: '(10 Menit)',
-                description:
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-                iconPath: 'assets/icons/run_icon.png',
-                fallbackIcon: Icons.directions_run,
-              ),
-              _buildStepCard(
-                title: '3. Pendinginan',
-                duration: '(10 Menit)',
-                description:
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In fermentum dignissim diam at elementum.',
-                iconPath: 'assets/icons/cooldown_icon.png',
-                fallbackIcon: Icons.self_improvement,
-              ),
+                if (warmup != null && warmup.isNotEmpty)
+                  _buildStepCard(
+                    title: '1. Pemanasan',
+                    duration: '(Awal)',
+                    description: warmup,
+                    iconPath: 'assets/icons/warmup_icon.png',
+                    fallbackIcon: Icons.accessibility_new,
+                  ),
+
+                if (main != null && main.isNotEmpty)
+                  _buildStepCard(
+                    title: '2. Latihan Inti',
+                    duration: '(${widget.schedule.durationMinutes} Menit)',
+                    description: main,
+                    iconPath: 'assets/icons/run_icon.png',
+                    fallbackIcon: Icons.directions_run,
+                  ),
+
+                if (cooldown != null && cooldown.isNotEmpty)
+                  _buildStepCard(
+                    title: '3. Pendinginan',
+                    duration: '(Akhir)',
+                    description: cooldown,
+                    iconPath: 'assets/icons/cooldown_icon.png',
+                    fallbackIcon: Icons.self_improvement,
+                  ),
+              ],
 
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _isFinished
+                  onPressed: (_isFinished || !_isToday)
                       ? null
-                      : () {
-                          showDialog(
-                            context: parentContext,
-                            builder: (dialogContext) {
-                              return FinishConfirmation(
-                                onConfirm: () async {
-                                  if (!mounted) return;
-
-                                  setState(() {
-                                    _isFinished = true;
-                                  });
-
-                                  if (!mounted) return;
-                                  await showFinishPopUp(parentContext);
-
-                                  if (!mounted) return;
-                                  shoBagdeAchieve(parentContext);
-                                },
-                              );
-                            },
-                          );
-                        },
+                      : () => _handleFinishWorkout(context),
+                  // onPressed: _isFinished
+                  //     ? null
+                  //     : () => _handleFinishWorkout(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
@@ -287,7 +330,9 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                     shadowColor: AppColors.primary.withOpacity(0.4),
                   ),
                   child: Text(
-                    _isFinished ? 'Sudah Selesai' : 'Selesai',
+                    _isFinished
+                        ? 'Sudah Selesai'
+                        : (_isToday ? 'Selesai' : 'Belum Jadwalnya'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -343,8 +388,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 Text(
                   description,
                   style: AppTextStyles.paragraph2(color: AppColors.textPrimary),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

@@ -39,11 +39,13 @@ class AuthProvider extends ChangeNotifier {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) return;
+
       final response = await Supabase.instance.client
           .schema('runmates')
           .from('profiles')
-          .select()
-          .eq('id', user.id)
+          .update({'is_plan_ready': true})
+          .eq('id', user.id) 
+          .select() 
           .single();
 
       _currentUser = UserModel.fromJson(response);

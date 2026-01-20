@@ -5,6 +5,7 @@ import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/home/notification.dart';
 import 'package:runmates/features/main/home/tips_detail.dart';
 import 'package:runmates/providers/auth_provider.dart';
+import 'package:runmates/providers/prgram_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,6 +30,9 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthProvider>().loadUserProfile();
       context.read<TipsProvider>().fetchTips();
+      context.read<ProgramProvider>().fetchProgramProgress();
+      context.read<ProgramProvider>().fetchTodaySchedule();
+      context.read<ProgramProvider>().fetchWeeklyProgress();
     });
   }
 
@@ -123,8 +127,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      TipsDetail(tip: tip),
+                                  builder: (context) => TipsDetail(tip: tip),
                                 ),
                               );
                             },
@@ -143,15 +146,15 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 24),
 
               // card latihan hari ini
-              _buildTodayActivityCard(),
+              _buildTodayActivityCard(context),
               const SizedBox(height: 20),
 
               // card program lari
-              _buildProgramCard(),
+              _buildProgramCard(context),
               const SizedBox(height: 20),
 
               // card progress minggu ini
-              _buildWeeklyProgressCard(),
+              _buildWeeklyProgressCard(context),
               const SizedBox(height: 20),
             ],
           ),
@@ -253,7 +256,90 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card latihan hari ini
-  Widget _buildTodayActivityCard() {
+  Widget _buildTodayActivityCard(BuildContext context) {
+    final programProvider = context.watch<ProgramProvider>();
+    final schedule = programProvider.todaySchedule;
+    final isLoading = programProvider.isTodayLoading;
+
+    final now = DateTime.now();
+    final List<String> days = [
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu',
+    ];
+    final dayName = days[now.weekday - 1];
+    final dateString = "$dayName, ${now.day}/${now.month}";
+
+    if (isLoading) {
+      return Container(
+        height: 120,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(color: AppColors.textSecondary),
+        ),
+      );
+    }
+
+    if (schedule == null) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[800],
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hari ini • $dateString',
+              style: AppTextStyles.heading4Uppercase(
+                weight: FontWeight.normal,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.nightlight_round,
+                  color: Colors.yellow,
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'REST DAY',
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Istirahatkan tubuhmu hari ini.',
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -267,7 +353,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Latihan hari ini • Minggu 1, Hari 3',
+                'Latihan hari ini • $dateString',
                 style: AppTextStyles.heading4Uppercase(
                   weight: FontWeight.normal,
                   color: AppColors.textSecondary,
@@ -275,7 +361,8 @@ class _HomePageState extends State<HomePage> {
               ),
               GestureDetector(
                 onTap: () {
-                  // Aksi untuk 'Lihat detail'
+                  // TODO: Navigasi ke halaman detail latihan
+                  // Navigator.push(context, MaterialPageRoute(builder: (c) => WorkoutDetailPage(schedule: schedule)));
                 },
                 child: Row(
                   children: [
@@ -286,7 +373,7 @@ class _HomePageState extends State<HomePage> {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.chevron_right,
                       color: AppColors.textSecondary,
                       size: 16,
@@ -296,29 +383,72 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+
           Text(
-            'INTERVAL RUN',
+            schedule.workoutTitle.toUpperCase(),
             style: AppTextStyles.heading4(
               weight: FontWeight.bold,
               color: AppColors.textSecondary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
+
           Text(
-            'Melatih daya tahan & kecepatan',
+            schedule.workoutSubtitle.toLowerCase(),
             style: AppTextStyles.heading4Uppercase(
               weight: FontWeight.normal,
               color: AppColors.textSecondary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
+
+          if (schedule.isDone)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "SELESAI ✅",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
   // card program lari
-  Widget _buildProgramCard() {
+  Widget _buildProgramCard(BuildContext context) {
+    final programProvider = context.watch<ProgramProvider>();
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.currentUser;
+
+    String formatDuration(int minutes) {
+      if (minutes < 60) return '$minutes Menit';
+      final hours = minutes / 60;
+      return '${hours.toStringAsFixed(1).replaceAll('.0', '')} Jam';
+    }
+
+    final targetDistance = user?.targetDistanceKm ?? 0;
+    final targetTime = user?.targetTimeMinutes ?? 0;
+
+    final totalWeeks = programProvider.totalWeeks;
+    final progressPercent = programProvider.progressPercentage;
+    final progressLabel = (progressPercent * 100).toInt();
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -329,21 +459,33 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Program lari 20K',
+            'Program lari ${targetDistance}K',
             style: AppTextStyles.heading4(
               weight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            '12 Minggu • Target : 20K dalam 1 jam',
-            style: AppTextStyles.heading4Uppercase(
-              weight: FontWeight.normal,
-              color: AppColors.textPrimary,
-            ),
-          ),
+
+          programProvider.isProgressLoading
+              ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                )
+              : Text(
+                  '$totalWeeks Minggu • Target : ${targetDistance}K dalam ${formatDuration(targetTime)}',
+                  style: AppTextStyles.heading4Uppercase(
+                    weight: FontWeight.normal,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+
           const SizedBox(height: 16),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -355,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Text(
-                '25%',
+                '$progressLabel%',
                 style: AppTextStyles.heading4Uppercase(
                   weight: FontWeight.normal,
                   color: AppColors.textPrimary,
@@ -364,12 +506,15 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 8),
+
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: 0.25,
+              value: progressPercent,
               backgroundColor: Colors.grey[800],
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
+              ),
               minHeight: 10,
             ),
           ),
@@ -379,7 +524,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   // card progress minggu ini
-  Widget _buildWeeklyProgressCard() {
+  Widget _buildWeeklyProgressCard(BuildContext context) {
+    final programProvider = context.watch<ProgramProvider>();
+    final finished = programProvider.completedSessionsThisWeek;
+    final total = programProvider.totalSessionsThisWeek;
+    final durationStr = programProvider.totalDurationFormatted;
+    const distanceStr = "0.0";
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -397,63 +548,85 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 16),
-          // baris statistik
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildStatCard('5.5', 'KM'),
-              _buildStatCard('3/6', 'Sesi'),
-              _buildStatCard('2:30', 'Jam'),
-            ],
-          ),
+
+          programProvider.isWeeklyLoading
+              ? const Center(
+                  child: LinearProgressIndicator(color: AppColors.primary),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildStatCard(distanceStr, 'KM'),
+                    _buildStatCard('$finished/$total', 'Sesi'),
+                    _buildStatCard(durationStr, 'Jam'),
+                  ],
+                ),
+
           const SizedBox(height: 16),
-          // baris indikator hari
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildDayIndicator('S', isDone: true, isRed: true),
-              _buildDayIndicator('S', isDone: true, isRed: true),
-              _buildDayIndicator('R', isDone: true, isRed: true),
-              _buildDayIndicator('K'),
-              _buildDayIndicator('J'),
-              _buildDayIndicator('S'),
-              _buildDayIndicator('M'),
+              _buildDayIndicator(
+                'S',
+                status: programProvider.getDayStatus(1),
+              ), // Senin
+              _buildDayIndicator(
+                'S',
+                status: programProvider.getDayStatus(2),
+              ), // Selasa
+              _buildDayIndicator(
+                'R',
+                status: programProvider.getDayStatus(3),
+              ), // Rabu
+              _buildDayIndicator(
+                'K',
+                status: programProvider.getDayStatus(4),
+              ), // Kamis
+              _buildDayIndicator(
+                'J',
+                status: programProvider.getDayStatus(5),
+              ), // Jumat
+              _buildDayIndicator(
+                'S',
+                status: programProvider.getDayStatus(6),
+              ), // Sabtu
+              _buildDayIndicator(
+                'M',
+                status: programProvider.getDayStatus(7),
+              ), // Minggu
             ],
           ),
+
           const SizedBox(height: 16),
           const Divider(color: Colors.white),
           const SizedBox(height: 8),
-          // baris peningkatan
+
           Row(
             children: [
-              Icon(Icons.trending_up, color: AppColors.primary, size: 20),
+              const Icon(Icons.trending_up, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Peningkatan minggu ini',
+                      'Konsistensi',
                       style: AppTextStyles.heading4Uppercase(
                         weight: FontWeight.normal,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     Text(
-                      'Jarak lari meningkat 2KM dari minggu lalu',
+                      finished > 0
+                          ? 'Terus pertahankan performamu!'
+                          : 'Ayo mulai latihan pertamamu!',
                       style: AppTextStyles.heading4Uppercase(
                         weight: FontWeight.normal,
                         color: AppColors.textPrimary,
                       ),
                     ),
                   ],
-                ),
-              ),
-              Text(
-                '+20%',
-                style: AppTextStyles.heading4Uppercase(
-                  weight: FontWeight.w500,
-                  color: AppColors.primary,
                 ),
               ),
             ],
@@ -495,18 +668,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   // indikator hari
-  Widget _buildDayIndicator(
-    String day, {
-    bool isDone = false,
-    bool isRed = false,
-  }) {
-    Color circleColor = Colors.white;
+  Widget _buildDayIndicator(String day, {required int status}) {
+    Color circleColor = Colors.transparent;
     Widget child = Text(
       day,
-      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+      style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
     );
 
-    if (isDone) {
+    if (status == 1) {
+      circleColor = Colors.white;
+      child = Text(
+        day,
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else if (status == 2) {
       circleColor = AppColors.primary;
       child = const Icon(Icons.check, color: Colors.white, size: 16);
     }
@@ -514,7 +692,13 @@ class _HomePageState extends State<HomePage> {
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(color: circleColor, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: circleColor,
+        shape: BoxShape.circle,
+        border: status == 0
+            ? Border.all(color: Colors.grey[700]!, width: 1)
+            : null,
+      ),
       child: Center(child: child),
     );
   }

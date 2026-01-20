@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:runmates/service/ai_training_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegistrationProvider extends ChangeNotifier {
@@ -88,6 +89,19 @@ class RegistrationProvider extends ChangeNotifier {
         'available_days': availableDays,
         'fcm_token': fcmToken,
       });
+
+      String genderStr = gender == 1 ? "Laki-laki" : "Perempuan";
+      String profileSummary = "$genderStr, $age tahun, $weightKg kg, $heightCm cm";
+
+      final aiService = AITrainingService();
+      
+      await aiService.generateAndSavePlan(
+        userId: user.id,
+        availableDays: availableDays,
+        targetDistance: targetDistanceKm,
+        targetTime: targetTimeMinutes,
+        userProfile: profileSummary,
+      );
 
       isLoading = false;
       notifyListeners();
