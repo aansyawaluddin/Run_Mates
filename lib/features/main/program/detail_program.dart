@@ -18,11 +18,19 @@ class ProgramDetailPage extends StatefulWidget {
 
 class _ProgramDetailPageState extends State<ProgramDetailPage> {
   bool _isFinished = false;
+  bool _isToday = false;
 
   @override
   void initState() {
     super.initState();
     _isFinished = widget.schedule.isDone;
+    final now = DateTime.now();
+    final scheduleDate = widget.schedule.scheduledDate;
+
+    _isToday =
+        now.year == scheduleDate.year &&
+        now.month == scheduleDate.month &&
+        now.day == scheduleDate.day;
   }
 
   Future<void> _handleFinishWorkout(BuildContext context) async {
@@ -72,7 +80,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final parentContext = context;
     final Map<String, dynamic> steps = widget.schedule.steps;
     final String? warmup = steps['warmup'];
     final String? main = steps['main'];
@@ -165,15 +172,14 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            if (widget.schedule.workoutSubtitle != null)
-                              Text(
-                                widget.schedule.workoutSubtitle!,
-                                style: AppTextStyles.heading4(
-                                  weight: FontWeight.w500,
-                                  color: AppColors.textSecondary,
-                                ),
-                                textAlign: TextAlign.center,
+                            Text(
+                              widget.schedule.workoutSubtitle,
+                              style: AppTextStyles.heading4(
+                                weight: FontWeight.w500,
+                                color: AppColors.textSecondary,
                               ),
+                              textAlign: TextAlign.center,
+                            ),
                           ],
                         ),
                       ),
@@ -307,9 +313,12 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _isFinished
+                  onPressed: (_isFinished || !_isToday)
                       ? null
                       : () => _handleFinishWorkout(context),
+                  // onPressed: _isFinished
+                  //     ? null
+                  //     : () => _handleFinishWorkout(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
@@ -321,7 +330,9 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                     shadowColor: AppColors.primary.withOpacity(0.4),
                   ),
                   child: Text(
-                    _isFinished ? 'Sudah Selesai' : 'Selesai',
+                    _isFinished
+                        ? 'Sudah Selesai'
+                        : (_isToday ? 'Selesai' : 'Belum Jadwalnya'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
