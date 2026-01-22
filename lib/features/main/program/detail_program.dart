@@ -313,12 +313,12 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: (_isFinished || !_isToday)
-                      ? null
-                      : () => _handleFinishWorkout(context),
-                  // onPressed: _isFinished
+                  // onPressed: (_isFinished || !_isToday)
                   //     ? null
                   //     : () => _handleFinishWorkout(context),
+                  onPressed: _isFinished
+                      ? null
+                      : () => _handleFinishWorkout(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.primary.withOpacity(0.5),

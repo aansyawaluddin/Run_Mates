@@ -8,7 +8,7 @@ class AITrainingService {
 
   String get apiKey => dotenv.env['AI_API_KEY'] ?? '';
 
-  final String model = 'gemini-2.5-pro';
+  final String model = 'gemini-2.5-flash';
 
   Future<void> generateAndSavePlan({
     required String userId,
@@ -20,6 +20,7 @@ class AITrainingService {
     if (apiKey.isEmpty) throw 'API Key tidak ditemukan di .env';
     if (availableDays.isEmpty) throw 'Hari latihan tidak boleh kosong.';
 
+    // --- LOGIKA TANGGAL ---
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
     DateTime programStartDate;
@@ -52,10 +53,19 @@ class AITrainingService {
       - HARI LARI TERSEDIA: ${availableDays.join(', ')}.
       - JUMLAH HARI LARI: ${availableDays.length} Hari.
 
-      ATURAN JSON (WAJIB):
+      ATURAN KONTEN PENTING (WAJIB DIPATUHI):
+      1. Key "title" HARUS menggunakan ISTILAH LARI STANDAR (Inggris/Indonesia Baku).
+         - CONTOH BENAR: "Easy Run", "Long Run", "Interval Run", "Tempo Run", "Fartlek", "Recovery Run".
+         - CONTOH SALAH: "Lari Mudah Aerobik", "Lari Santai Pagi", "Latihan Kekuatan & Stabilitas".
+      2. Key "steps" -> "main" WAJIB MENYERTAKAN JARAK (KM/Meter) secara eksplisit.
+         - JANGAN HANYA DURASI WAKTU.
+         - CONTOH BENAR: "Lari Easy Run sejauh 5 km di Zone 2." atau "Interval 8 x 400m dengan istirahat 2 menit."
+         - CONTOH SALAH: "Lari santai selama 30 menit."
+
+      ATURAN JSON:
       1. Output HANYA JSON Array.
       2. Key "day" HARUS: "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu".
-      3. Pastikan setiap objek hari memiliki key: "title", "subtitle", "objective", "duration", dan "steps" (warmup, main, cooldown).
+      3. Struktur object hari: "title", "subtitle", "objective", "duration", "steps" (warmup, main, cooldown).
 
       LOGIKA PENJADWALAN:
       - Jika <= 2 hari: Fokus Speed & Long Run.
@@ -70,16 +80,28 @@ class AITrainingService {
           "days": [
             {
               "day": "Senin",
-              "title": "Speed Interval",
-              "subtitle": "VO2 Max",
-              "objective": "Meningkatkan kecepatan.",
+              "title": "Speed Interval", 
+              "subtitle": "VO2 Max Builder",
+              "objective": "Meningkatkan kecepatan dan ambang laktat.",
               "duration": 60,
               "steps": {
-                 "warmup": "Jogging 10 menit",
-                 "main": "5km run",
-                 "cooldown": "Jalan 5 menit"
+                 "warmup": "Jogging 10 menit + Dynamic Stretch",
+                 "main": "Interval 6 x 800m @ Target Pace, Istirahat 90 detik jog",
+                 "cooldown": "Jogging pendinginan 10 menit"
               }
             },
+            {
+              "day": "Selasa",
+              "title": "Easy Run",
+              "subtitle": "Aerobic Base",
+              "objective": "Membangun pondasi aerobik.",
+              "duration": 45,
+              "steps": {
+                 "warmup": "Jalan cepat 5 menit",
+                 "main": "Lari Easy sejauh 5 km di Zone 2 (Conversational Pace)",
+                 "cooldown": "Jalan kaki 5 menit"
+              }
+            }
             ... (LENGKAPI 7 HARI SENIN-MINGGU)
           ]
         },
@@ -106,7 +128,7 @@ class AITrainingService {
             },
           ],
           "generationConfig": {
-            "temperature": 0.5,
+            "temperature": 0.4, 
             "responseMimeType": "application/json",
           },
         }),
@@ -122,7 +144,6 @@ class AITrainingService {
 
         String content = data['candidates'][0]['content']['parts'][0]['text'];
 
-        // Bersihkan Markdown
         content = content.replaceAll(
           RegExp(r'```json', caseSensitive: false),
           '',
@@ -146,7 +167,6 @@ class AITrainingService {
           int weekNum = weekItem['week'];
           int weekIndex = weekNum - 1;
 
-          // Insert Program Weeks
           final weekRes = await supabase
               .schema('runmates')
               .from('program_weeks')
@@ -169,7 +189,6 @@ class AITrainingService {
                 : {'instruction': 'Lihat deskripsi.'};
 
             String dayNameAI = dayItem['day'] ?? 'Senin';
-
             int dayOffset = dayOffsets[dayNameAI] ?? 0;
             DateTime scheduledDate = programStartDate.add(
               Duration(days: (weekIndex * 7) + dayOffset),
