@@ -529,7 +529,9 @@ class _HomePageState extends State<HomePage> {
     final finished = programProvider.completedSessionsThisWeek;
     final total = programProvider.totalSessionsThisWeek;
     final durationStr = programProvider.totalDurationFormatted;
-    const distanceStr = "0.0";
+    final distanceStr = programProvider.totalDistanceThisWeek.toStringAsFixed(
+      1,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16.0),

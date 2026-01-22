@@ -25,6 +25,7 @@ class ProgramProvider extends ChangeNotifier {
   int _completedSessionsThisWeek = 0;
   int _totalSessionsThisWeek = 0;
   int _totalDurationMinutesThisWeek = 0;
+  double _totalDistanceThisWeek = 0.0;
 
   // State untuk Progress Dashboard (Card Program)
   int _totalWeeks = 0;
@@ -48,12 +49,29 @@ class ProgramProvider extends ChangeNotifier {
   bool get isWeeklyLoading => _isWeeklyLoading;
   int get completedSessionsThisWeek => _completedSessionsThisWeek;
   int get totalSessionsThisWeek => _totalSessionsThisWeek;
+  double get totalDistanceThisWeek => _totalDistanceThisWeek;
 
   // Helper untuk konversi menit ke jam
   String get totalDurationFormatted {
     final hours = _totalDurationMinutesThisWeek ~/ 60;
     final minutes = _totalDurationMinutesThisWeek % 60;
     return '$hours:${minutes.toString().padLeft(2, '0')}';
+  }
+
+  // Helper function untuk ekstrak angka dari teks JSON
+  double _parseDistanceFromSteps(dynamic steps) {
+    try {
+      if (steps == null || steps is! Map) return 0.0;
+      final String mainText = steps['main']?.toString().toLowerCase() ?? '';
+      final RegExp regex = RegExp(r'(\d+(\.\d+)?)\s*km');
+      final match = regex.firstMatch(mainText);
+      if (match != null) {
+        return double.tryParse(match.group(1) ?? '0') ?? 0.0;
+      }
+      return 0.0;
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   double get progressPercentage {
@@ -105,12 +123,13 @@ class ProgramProvider extends ChangeNotifier {
   Future<void> fetchTodaySchedule() async {
     try {
       _isTodayLoading = true;
-      
+
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) return;
 
       final now = DateTime.now();
-      final dateStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      final dateStr =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
       final response = await _supabase
           .schema('runmates')
@@ -134,11 +153,12 @@ class ProgramProvider extends ChangeNotifier {
     }
   }
 
-  // Mengambil progress minggu ini 
+  // Mengambil progress minggu ini
   Future<void> fetchWeeklyProgress() async {
     try {
       _isWeeklyLoading = true;
-      
+      _totalDistanceThisWeek = 0.0;
+
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) return;
 
@@ -158,15 +178,26 @@ class ProgramProvider extends ChangeNotifier {
           .lte('scheduled_date', endStr);
 
       final List<dynamic> data = response;
-      _weeklySchedules = data.map((json) => DailyScheduleModel.fromJson(json)).toList();
+      _weeklySchedules = data
+          .map((json) => DailyScheduleModel.fromJson(json))
+          .toList();
 
       _totalSessionsThisWeek = _weeklySchedules.length;
-      _completedSessionsThisWeek = _weeklySchedules.where((e) => e.isDone).length;
-      
-      _totalDurationMinutesThisWeek = _weeklySchedules
-          .where((e) => e.isDone)
-          .fold(0, (sum, item) => sum + item.durationMinutes);
 
+      final completedSchedules = _weeklySchedules
+          .where((e) => e.isDone)
+          .toList();
+
+      _completedSessionsThisWeek = completedSchedules.length;
+
+      _totalDurationMinutesThisWeek = completedSchedules.fold(
+        0,
+        (sum, item) => sum + item.durationMinutes,
+      );
+
+      _totalDistanceThisWeek = completedSchedules.fold(0.0, (sum, item) {
+        return sum + _parseDistanceFromSteps(item.steps);
+      });
     } catch (e) {
       debugPrint("Error fetching weekly progress: $e");
     } finally {
@@ -182,7 +213,7 @@ class ProgramProvider extends ChangeNotifier {
       );
       return schedule.isDone ? 2 : 1;
     } catch (e) {
-      return 0; 
+      return 0;
     }
   }
 
@@ -285,7 +316,7 @@ class ProgramProvider extends ChangeNotifier {
     }
   }
 
-  /// Cek Achievement 
+  /// Cek Achievement
   Future<bool> hasAchievement(int achievementId) async {
     try {
       final userId = _supabase.auth.currentUser?.id;
