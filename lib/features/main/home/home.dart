@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:runmates/cores/app_colors.dart';
 import 'package:runmates/cores/app_text_styles.dart';
 import 'package:runmates/features/main/home/notification.dart';
 import 'package:runmates/features/main/home/tips_detail.dart';
+import 'package:runmates/features/main/program/detail_program.dart';
 import 'package:runmates/providers/auth_provider.dart';
 import 'package:runmates/providers/prgram_provider.dart';
 import 'package:runmates/providers/tips_provider.dart';
@@ -27,13 +29,97 @@ class _HomePageState extends State<HomePage> {
         _currentPage = _pageController.page?.round() ?? 0;
       });
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final programProvider = context.read<ProgramProvider>();
+
       context.read<AuthProvider>().loadUserProfile();
       context.read<TipsProvider>().fetchTips();
-      context.read<ProgramProvider>().fetchProgramProgress();
-      context.read<ProgramProvider>().fetchTodaySchedule();
-      context.read<ProgramProvider>().fetchWeeklyProgress();
+      programProvider.fetchProgramProgress();
+      programProvider.fetchTodaySchedule();
+      programProvider.fetchWeeklyProgress();
+      final bool isPenaltyApplied = await programProvider
+          .checkAndApplyPenalty();
+
+      if (isPenaltyApplied && mounted) {
+        await _checkAndShowDialog(context);
+      }
     });
+  }
+
+  Future<void> _checkAndShowDialog(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String todayDate = DateTime.now().toIso8601String().split('T')[0];
+    final String? lastShownDate = prefs.getString('penalty_popup_shown_date');
+    if (lastShownDate != todayDate) {
+      if (context.mounted) {
+        _showPenaltyDialog(context);
+
+        await prefs.setString('penalty_popup_shown_date', todayDate);
+      }
+    }
+  }
+
+  void _showPenaltyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.textSecondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: const BorderSide(color: AppColors.primary, width: 2),
+          ),
+          title: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.orange,
+                size: 30,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Program Disesuaikan',
+                  style: AppTextStyles.heading4(
+                    weight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Kamu telah melewatkan lebih dari 2 sesi latihan. \n\nUntuk menjaga targetmu tetap tercapai, beban latihan hari ini sedikit ditingkatkan. \n\nAyo kejar ketertinggalanmu!',
+            style: AppTextStyles.paragraph1(color: AppColors.textPrimary),
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Siap, Laksanakan!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -361,8 +447,13 @@ class _HomePageState extends State<HomePage> {
               ),
               GestureDetector(
                 onTap: () {
-                  // TODO: Navigasi ke halaman detail latihan
-                  // Navigator.push(context, MaterialPageRoute(builder: (c) => WorkoutDetailPage(schedule: schedule)));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProgramDetailPage(schedule: schedule),
+                    ),
+                  );
                 },
                 child: Row(
                   children: [
@@ -385,46 +476,41 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 12),
 
-          Text(
-            schedule.workoutTitle.toUpperCase(),
-            style: AppTextStyles.heading4(
-              weight: FontWeight.bold,
-              color: AppColors.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-
-          Text(
-            schedule.workoutSubtitle.toLowerCase(),
-            style: AppTextStyles.heading4Uppercase(
-              weight: FontWeight.normal,
-              color: AppColors.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          if (schedule.isDone)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  "SELESAI ✅",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      schedule.workoutTitle.toUpperCase(),
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      schedule.workoutSubtitle.toLowerCase(),
+                      style: AppTextStyles.heading4Uppercase(
+                        weight: FontWeight.normal,
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-            ),
+              if (schedule.isDone) ...[
+                const SizedBox(width: 12),
+                const Icon(Icons.check_circle, color: Colors.white, size: 28),
+              ],
+            ],
+          ),
         ],
       ),
     );
@@ -435,12 +521,6 @@ class _HomePageState extends State<HomePage> {
     final programProvider = context.watch<ProgramProvider>();
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.currentUser;
-
-    String formatDuration(int minutes) {
-      if (minutes < 60) return '$minutes Menit';
-      final hours = minutes / 60;
-      return '${hours.toStringAsFixed(1).replaceAll('.0', '')} Jam';
-    }
 
     final targetDistance = user?.targetDistanceKm ?? 0;
     final targetTime = user?.targetTimeMinutes ?? 0;
@@ -477,7 +557,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               : Text(
-                  '$totalWeeks Minggu • Target : ${targetDistance}K dalam ${formatDuration(targetTime)}',
+                  '$totalWeeks Minggu • Target : ${targetDistance}K dalam ${programProvider.formatDuration(targetTime)}',
                   style: AppTextStyles.heading4Uppercase(
                     weight: FontWeight.normal,
                     color: AppColors.textPrimary,
@@ -533,6 +613,10 @@ class _HomePageState extends State<HomePage> {
       1,
     );
 
+    // Ambil nomor minggu dari Provider (pastikan Anda sudah update Providernya)
+    // Jika belum update Provider, ganti ini dengan angka default/dummy dulu
+    final currentWeek = programProvider.currentWeekNumber;
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -543,7 +627,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Progress Minggu Ini',
+            'Progress Minggu $currentWeek',
             style: AppTextStyles.heading4(
               weight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -689,6 +773,9 @@ class _HomePageState extends State<HomePage> {
     } else if (status == 2) {
       circleColor = AppColors.primary;
       child = const Icon(Icons.check, color: Colors.white, size: 16);
+    } else if (status == 3) {
+      circleColor = Colors.red;
+      child = const Icon(Icons.close, color: Colors.white, size: 16);
     }
 
     return Container(

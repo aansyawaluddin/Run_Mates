@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:runmates/service/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:runmates/models/program_week_model.dart';
 import 'package:runmates/models/daily_schedule_model.dart';
@@ -26,6 +27,9 @@ class ProgramProvider extends ChangeNotifier {
   int _totalSessionsThisWeek = 0;
   int _totalDurationMinutesThisWeek = 0;
   double _totalDistanceThisWeek = 0.0;
+
+  int _currentWeekNumber = 1;
+  int get currentWeekNumber => _currentWeekNumber;
 
   // State untuk Progress Dashboard (Card Program)
   int _totalWeeks = 0;
@@ -58,18 +62,54 @@ class ProgramProvider extends ChangeNotifier {
     return '$hours:${minutes.toString().padLeft(2, '0')}';
   }
 
-  // Helper function untuk ekstrak angka dari teks JSON
+  String formatDuration(int totalMinutes) {
+    if (totalMinutes <= 0) return '0 Menit';
+
+    final int hours = totalMinutes ~/ 60;
+    final int minutes = totalMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+      return '$hours Jam $minutes Menit';
+    } else if (hours > 0) {
+      return '$hours Jam';
+    } else {
+      return '$minutes Menit';
+    }
+  }
+
   double _parseDistanceFromSteps(dynamic steps) {
     try {
       if (steps == null || steps is! Map) return 0.0;
-      final String mainText = steps['main']?.toString().toLowerCase() ?? '';
-      final RegExp regex = RegExp(r'(\d+(\.\d+)?)\s*km');
-      final match = regex.firstMatch(mainText);
-      if (match != null) {
-        return double.tryParse(match.group(1) ?? '0') ?? 0.0;
+
+      String text = steps['main']?.toString().toLowerCase() ?? '';
+
+      text = text.replaceAll(RegExp(r'\d+:\d+\s*(min/km|menit/km)'), '');
+
+      final explicitKmRegex = RegExp(
+        r'(total|sejauh|jarak).*?(\d+(\.\d+)?)\s*km',
+      );
+      final explicitMatch = explicitKmRegex.firstMatch(text);
+      if (explicitMatch != null) {
+        return double.tryParse(explicitMatch.group(2) ?? '0') ?? 0.0;
       }
+
+      final intervalMeterRegex = RegExp(r'(\d+)\s*x\s*(\d+)\s*m');
+      final intervalMatch = intervalMeterRegex.firstMatch(text);
+      if (intervalMatch != null) {
+        double reps = double.tryParse(intervalMatch.group(1) ?? '0') ?? 0.0;
+        double distM = double.tryParse(intervalMatch.group(2) ?? '0') ?? 0.0;
+        return (reps * distM) / 1000;
+      }
+
+      final simpleKmRegex = RegExp(r'(\d+(\.\d+)?)\s*km');
+      final simpleMatch = simpleKmRegex.firstMatch(text);
+      if (simpleMatch != null) {
+        return double.tryParse(simpleMatch.group(1) ?? '0') ?? 0.0;
+      }
+
       return 0.0;
     } catch (e) {
+      debugPrint("Error parsing distance: $e");
       return 0.0;
     }
   }
@@ -172,12 +212,20 @@ class ProgramProvider extends ChangeNotifier {
       final response = await _supabase
           .schema('runmates')
           .from('daily_schedules')
-          .select()
+          .select('*, program_weeks(week_number)')
           .eq('user_id', userId)
           .gte('scheduled_date', startStr)
           .lte('scheduled_date', endStr);
 
       final List<dynamic> data = response;
+
+      if (data.isNotEmpty) {
+        final firstItem = data.first;
+        if (firstItem['program_weeks'] != null) {
+          _currentWeekNumber = firstItem['program_weeks']['week_number'] ?? 1;
+        }
+      }
+
       _weeklySchedules = data
           .map((json) => DailyScheduleModel.fromJson(json))
           .toList();
@@ -211,7 +259,25 @@ class ProgramProvider extends ChangeNotifier {
       final schedule = _weeklySchedules.firstWhere(
         (s) => s.scheduledDate.weekday == weekday,
       );
-      return schedule.isDone ? 2 : 1;
+
+      if (schedule.isDone) {
+        return 2;
+      }
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      final scheduleDate = DateTime(
+        schedule.scheduledDate.year,
+        schedule.scheduledDate.month,
+        schedule.scheduledDate.day,
+      );
+
+      if (scheduleDate.isBefore(today)) {
+        return 3;
+      }
+
+      return 1;
     } catch (e) {
       return 0;
     }
@@ -267,6 +333,7 @@ class ProgramProvider extends ChangeNotifier {
       _dailySchedules = data
           .map((json) => DailyScheduleModel.fromJson(json))
           .toList();
+      await LocalNotificationService.scheduleWorkoutReminders(_dailySchedules);
     } catch (e) {
       debugPrint("Error fetching daily schedules: $e");
     } finally {
@@ -333,6 +400,123 @@ class ProgramProvider extends ChangeNotifier {
       return response != null;
     } catch (e) {
       debugPrint("Error checking achievement: $e");
+      return false;
+    }
+  }
+
+  /// Penalty System
+  Future<bool> checkAndApplyPenalty() async {
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return false;
+
+      final now = DateTime.now();
+      final todayStr =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+      final missedResponse = await _supabase
+          .schema('runmates')
+          .from('daily_schedules')
+          .select('id')
+          .eq('user_id', userId)
+          .lt('scheduled_date', todayStr)
+          .eq('is_done', false);
+
+      final int missedCount = (missedResponse as List).length;
+
+      if (missedCount >= 2) {
+        final nextWorkoutResponse = await _supabase
+            .schema('runmates')
+            .from('daily_schedules')
+            .select()
+            .eq('user_id', userId)
+            .gte('scheduled_date', todayStr)
+            .eq('is_done', false)
+            .order('scheduled_date', ascending: true)
+            .limit(1)
+            .maybeSingle();
+
+        if (nextWorkoutResponse != null) {
+          final String currentTitle =
+              nextWorkoutResponse['workout_title'] ?? '';
+
+          if (!currentTitle.contains('(Extra Load)')) {
+            final int currentDuration =
+                nextWorkoutResponse['duration_minutes'] ?? 0;
+            final int newDuration = currentDuration + 15;
+
+            Map<String, dynamic> currentSteps = Map<String, dynamic>.from(
+              nextWorkoutResponse['steps'] ?? {},
+            );
+            String mainStep = currentSteps['main']?.toString() ?? '';
+
+            // Apakah ini latihan Interval? (Ada format "6 x 400m")
+            if (mainStep.contains(RegExp(r'\d+\s*x'))) {
+              // Cari angka sebelum huruf 'x' (contoh: "6" dari "6 x 400m")
+              final intervalRegex = RegExp(r'(\d+)(\s*x)');
+              mainStep = mainStep.replaceAllMapped(intervalRegex, (match) {
+                int reps = int.tryParse(match.group(1) ?? '0') ?? 0;
+                if (reps > 0) {
+                  // Hukuman: Tambah 2 repetisi (misal 6x jadi 8x)
+                  return "${reps + 2}${match.group(2)}";
+                }
+                return match.group(0)!;
+              });
+            }
+            // Apakah ini Lari Jarak Jauh? (Ada format "5 km" atau "5.0 km")
+            // Kita pakai lookbehind negatif (logic manual) untuk hindari "min/km" (pace)
+            else if (mainStep.contains('km')) {
+              final kmRegex = RegExp(r'(\d+(\.\d+)?)\s*km');
+              // Kita iterasi semua match, tapi biasanya jarak utama ada di awal atau setelah kata "total"
+              // Untuk simpelnya, kita ganti angka "km" pertama yang ditemukan yang nilainya masuk akal (bukan pace)
+              mainStep = mainStep.replaceAllMapped(kmRegex, (match) {
+                double val = double.tryParse(match.group(1) ?? '0') ?? 0;
+                // Filter: Jika angka < 15 kemungkinan itu jarak. Jika > 15 kemungkinan pace menit (kecuali ultramarathon).
+                // Atau kita pastikan tidak ada "min/" atau "menit/" sebelumnya (tapi regex dart lookbehind terbatas).
+                // Solusi aman: Tambah jarak hanya jika teks tidak mengandung format waktu "titik dua" sebelumnya (misal 5:30)
+                bool isPace = mainStep
+                    .substring(0, match.start)
+                    .trim()
+                    .endsWith(':');
+
+                if (val > 0 && !isPace) {
+                  // Hukuman: Tambah 1.5 KM
+                  double newVal = val + 1.5;
+                  // Hapus .0 jika bulat
+                  String sVal = newVal.toString().replaceAll(
+                    RegExp(r'\.0$'),
+                    '',
+                  );
+                  return "$sVal km";
+                }
+                return match.group(0)!;
+              });
+            }
+
+            currentSteps['main'] = mainStep;
+
+            await _supabase
+                .schema('runmates')
+                .from('daily_schedules')
+                .update({
+                  'workout_title': '$currentTitle (Extra Load)',
+                  'duration_minutes': newDuration,
+                  'steps': currentSteps,
+                  'workout_objective':
+                      'Target jarak & durasi ditingkatkan karena kamu melewatkan $missedCount sesi latihan.',
+                })
+                .eq('id', nextWorkoutResponse['id']);
+
+            fetchTodaySchedule();
+            fetchWeeklyProgress();
+
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error applying penalty: $e");
       return false;
     }
   }

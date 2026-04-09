@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:runmates/service/running_knowledge.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AITrainingService {
@@ -12,15 +13,36 @@ class AITrainingService {
 
   Future<void> generateAndSavePlan({
     required String userId,
+    required int age,
+    required int weight,
+    required int height,
+    required String gender,
     required List<String> availableDays,
     required double targetDistance,
     required int targetTime,
-    required String userProfile,
   }) async {
     if (apiKey.isEmpty) throw 'API Key tidak ditemukan di .env';
     if (availableDays.isEmpty) throw 'Hari latihan tidak boleh kosong.';
 
-    // --- LOGIKA TANGGAL ---
+    double heightInM = height / 100;
+    double bmi = weight / (heightInM * heightInM);
+
+    String bmiStatus = "Normal";
+    if (bmi <= 18.49) {
+      bmiStatus = "Underweight";
+    } else if (bmi <= 24.9) {
+      bmiStatus = "Normal Weight";
+    } else if (bmi <= 27.0) {
+      bmiStatus = "Overweight";
+    } else {
+      bmiStatus = "Obese";
+    }
+
+    String expertContext = RunningKnowledgeBase.getRelevantTips(
+      age: age,
+      bmi: bmi,
+    );
+
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
     DateTime programStartDate;
@@ -44,34 +66,36 @@ class AITrainingService {
 
     final String prompt =
         '''
-      Berperanlah sebagai Pelatih Lari Maraton Profesional.
-      Buat jadwal latihan 5 minggu yang SANGAT DETAIL dan TERSTRUKTUR dalam format JSON.
+      Berperanlah sebagai Pelatih Lari Profesional Khusus PEMULA.
+      Buat jadwal latihan lari 5 minggu yang SANGAT DETAIL dan PERSONAL dalam format JSON.
 
-      DATA ATLET:
-      - Profil: $userProfile
+      DATA ATLET (PENGGUNA):
+      - Usia: $age tahun | Gender: $gender
+      - Fisik: Berat $weight kg, Tinggi $height cm
+      - BMI: ${bmi.toStringAsFixed(1)} ($bmiStatus)
       - Target: $targetDistance km dalam $targetTime menit.
-      - HARI LARI TERSEDIA: ${availableDays.join(', ')}.
-      - JUMLAH HARI LARI: ${availableDays.length} Hari.
+      - Hari Latihan: ${availableDays.join(', ')} (${availableDays.length} hari/minggu).
 
-      ATURAN KONTEN PENTING (WAJIB DIPATUHI):
-      1. Key "title" HARUS menggunakan ISTILAH LARI STANDAR (Inggris/Indonesia Baku).
-         - CONTOH BENAR: "Easy Run", "Long Run", "Interval Run", "Tempo Run", "Fartlek", "Recovery Run".
-         - CONTOH SALAH: "Lari Mudah Aerobik", "Lari Santai Pagi", "Latihan Kekuatan & Stabilitas".
-      2. Key "steps" -> "main" WAJIB MENYERTAKAN JARAK (KM/Meter) secara eksplisit.
-         - JANGAN HANYA DURASI WAKTU.
-         - CONTOH BENAR: "Lari Easy Run sejauh 5 km di Zone 2." atau "Interval 8 x 400m dengan istirahat 2 menit."
-         - CONTOH SALAH: "Lari santai selama 30 menit."
+      === ATURAN PELATIHAN & KESELAMATAN (WAJIB DIPATUHI) ===
+      Berdasarkan profil medis pengguna, kamu HARUS menerapkan aturan berikut dalam jadwal:
+      $expertContext
+      =======================================================
 
-      ATURAN JSON:
-      1. Output HANYA JSON Array.
-      2. Key "day" HARUS: "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu".
-      3. Struktur object hari: "title", "subtitle", "objective", "duration", "steps" (warmup, main, cooldown).
-
-      LOGIKA PENJADWALAN:
-      - Jika <= 2 hari: Fokus Speed & Long Run.
-      - Jika 3 hari: Interval, Easy, Long Run.
-      - Jika > 3 hari: Tambahkan Easy Run (Zone 2).
-      - Hari kosong diisi: Rest Day / Strength Training.
+      INSTRUKSI PENJADWALAN KETAT:
+      1. Jika User Obese/Overweight: Minggu 1-2 HARUS fokus "Walk-Run" (Jalan-Lari). Jangan beri lari full.
+      2. Key "title" gunakan bahasa Inggris baku (Easy Run, Long Run, Recovery Run, Rest Day).
+      3. Hari kosong diisi: "Rest Day" atau "Strength Training".
+      
+      4. ***ATURAN KHUSUS DETAIL LATIHAN (WAJIB)***:
+         Pada key "steps" -> "main":
+         a. WAJIB menyertakan estimasi PACE dalam format angka "mm:ss min/km" (misal: pace 7:30 min/km).
+            - Hitung pace berdasarkan target user ($targetTime menit / $targetDistance km).
+            - Untuk Easy Run, tambahkan 60-90 detik lebih lambat dari race pace.
+         b. WAJIB mengakhiri kalimat dengan estimasi total jarak: "Total jarak: X km".
+         
+         Contoh Format yang BENAR:
+         - "Lari konstan (pace 7:30-8:00 min/km) selama 20 menit. Total jarak: 3.0 km"
+         - "Interval: Lari (pace 5:30 min/km) 2 menit, Jalan 2 menit. Ulangi 5x. Total jarak: 2.5 km"
 
       FORMAT OUTPUT WAJIB (JSON ARRAY):
       [
@@ -80,37 +104,26 @@ class AITrainingService {
           "days": [
             {
               "day": "Senin",
-              "title": "Speed Interval", 
-              "subtitle": "VO2 Max Builder",
-              "objective": "Meningkatkan kecepatan dan ambang laktat.",
-              "duration": 60,
+              "title": "Easy Run", 
+              "subtitle": "Membangun Aerobik",
+              "objective": "Menjaga konsistensi pace.",
+              "duration": 30,
               "steps": {
-                 "warmup": "Jogging 10 menit + Dynamic Stretch",
-                 "main": "Interval 6 x 800m @ Target Pace, Istirahat 90 detik jog",
-                 "cooldown": "Jogging pendinginan 10 menit"
+                 "warmup": "Jalan cepat 5 menit.",
+                 "main": "Lari santai (pace 8:00-8:30 min/km) selama 20 menit tanpa henti. Total jarak: 2.5 km",
+                 "cooldown": "Jalan kaki 5 menit."
               }
             },
-            {
-              "day": "Selasa",
-              "title": "Easy Run",
-              "subtitle": "Aerobic Base",
-              "objective": "Membangun pondasi aerobik.",
-              "duration": 45,
-              "steps": {
-                 "warmup": "Jalan cepat 5 menit",
-                 "main": "Lari Easy sejauh 5 km di Zone 2 (Conversational Pace)",
-                 "cooldown": "Jalan kaki 5 menit"
-              }
-            }
-            ... (LENGKAPI 7 HARI SENIN-MINGGU)
+            ... (SISA HARI SENIN-MINGGU)
           ]
         },
         ... (ULANGI SAMPAI MINGGU 5)
       ]
+      HANYA BERIKAN JSON MURNI TANPA MARKDOWN (```json).
     ''';
 
     try {
-      print("Mengirim request ke Google AI Studio...");
+      print("Mengirim request ke Gemini...");
 
       final url = Uri.parse(
         'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
@@ -128,7 +141,7 @@ class AITrainingService {
             },
           ],
           "generationConfig": {
-            "temperature": 0.4, 
+            "temperature": 0.4,
             "responseMimeType": "application/json",
           },
         }),
@@ -144,18 +157,18 @@ class AITrainingService {
 
         String content = data['candidates'][0]['content']['parts'][0]['text'];
 
+        // Bersihkan Markdown
         content = content.replaceAll(
           RegExp(r'```json', caseSensitive: false),
           '',
         );
-        content = content.replaceAll(RegExp(r'```'), '');
+        content = content.replaceAll(RegExp(r'```'), '').trim();
 
         int startIndex = content.indexOf('[');
         int endIndex = content.lastIndexOf(']');
 
         if (startIndex == -1 || endIndex == -1) {
-          print("Raw Content: $content");
-          throw 'Format JSON rusak atau tidak ditemukan.';
+          throw 'Format JSON rusak.';
         }
 
         String jsonString = content.substring(startIndex, endIndex + 1);
@@ -174,7 +187,8 @@ class AITrainingService {
                 'user_id': userId,
                 'week_number': weekNum,
                 'title': weekNum == 5 ? 'Race Week' : 'Phase $weekNum',
-                'description': 'Minggu ke-$weekNum.',
+                'description':
+                    'Minggu ke-$weekNum. Fokus: ${weekItem['days'][0]['subtitle'] ?? 'Latihan'}',
               })
               .select()
               .single();
@@ -190,6 +204,7 @@ class AITrainingService {
 
             String dayNameAI = dayItem['day'] ?? 'Senin';
             int dayOffset = dayOffsets[dayNameAI] ?? 0;
+
             DateTime scheduledDate = programStartDate.add(
               Duration(days: (weekIndex * 7) + dayOffset),
             );

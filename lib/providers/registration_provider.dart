@@ -55,13 +55,26 @@ class RegistrationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> checkEmailExists(String emailCheck) async {
+    try {
+      final response = await Supabase.instance.client.rpc(
+        'check_email_exists',
+        params: {'email_input': emailCheck},
+      );
+
+      return response as bool;
+    } catch (e) {
+      debugPrint("Gagal cek email: $e");
+      return false;
+    }
+  }
+
   Future<String?> registerUser() async {
     try {
       isLoading = true;
       notifyListeners();
 
       final fcmToken = await FirebaseMessaging.instance.getToken();
-
       final supabase = Supabase.instance.client;
 
       final AuthResponse res = await supabase.auth.signUp(
@@ -88,24 +101,26 @@ class RegistrationProvider extends ChangeNotifier {
         'target_time_minutes': targetTimeMinutes,
         'available_days': availableDays,
         'fcm_token': fcmToken,
+        'is_plan_ready': false, 
       });
-
       String genderStr = gender == 1 ? "Laki-laki" : "Perempuan";
-      String profileSummary = "$genderStr, $age tahun, $weightKg kg, $heightCm cm";
 
       final aiService = AITrainingService();
-      
+
       await aiService.generateAndSavePlan(
         userId: user.id,
+        age: age,
+        weight: weightKg.round(), 
+        height: heightCm.round(),
+        gender: genderStr,
         availableDays: availableDays,
         targetDistance: targetDistanceKm,
         targetTime: targetTimeMinutes,
-        userProfile: profileSummary,
       );
 
       isLoading = false;
       notifyListeners();
-      return null;
+      return null; 
     } catch (e) {
       isLoading = false;
       notifyListeners();

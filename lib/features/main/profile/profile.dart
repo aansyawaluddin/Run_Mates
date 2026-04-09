@@ -16,12 +16,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  // State untuk status notifikasi (Default: Hidup)
+  bool _isNotificationEnabled = true;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthProvider>().loadUserProfile();
       context.read<AchievementProvider>().fetchProfileAchievements();
+
+      // TODO: Di sini Anda bisa menambahkan logika untuk mengambil
+      // status notifikasi terakhir dari SharedPreferences/Database
     });
   }
 
@@ -46,19 +52,26 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Foto Profil Placeholder
               const CircleAvatar(
                 radius: 50,
                 backgroundColor: Color(0xFFE0E0E0),
+                child: Icon(Icons.person, size: 50, color: Colors.white),
               ),
               const SizedBox(height: 15),
+
+              // Nama User
               Text(
-                user?.fullName ?? "",
+                user?.fullName ?? "User",
                 style: AppTextStyles.heading5(
                   weight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 5),
+
+              // Email User
               Text(
                 user?.email ?? "",
                 style: AppTextStyles.heading4Uppercase(
@@ -68,6 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 25),
 
+              // Statistik Fisik User
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.symmetric(vertical: 15),
@@ -93,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildStatItem(user?.age.toString() ?? "-", "Usia"),
                     _buildDivider(),
                     _buildStatItem(
-                      user?.heightCm.toStringAsFixed(2) ?? "-",
+                      user?.heightCm.toStringAsFixed(0) ?? "-",
                       "Tinggi (CM)",
                     ),
                   ],
@@ -101,10 +115,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 30),
 
-              // Menu List
+              // --- MENU LIST ---
+
+              // 1. Menu Edit Profile
               _buildMenuItem(
                 icon: Icons.person,
-                text: "Profile",
+                text: "Edit Profile",
                 color: AppColors.primary,
                 onTap: () {
                   Navigator.push(
@@ -115,14 +131,50 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
+
+              // 2. Menu Notification Setting (DENGAN SWITCH)
               _buildMenuItem(
                 icon: Icons.notifications,
                 text: "Notification Setting",
                 color: AppColors.primary,
+                // Menggunakan parameter trailing untuk Switch
+                trailing: Switch(
+                  value: _isNotificationEnabled,
+                  activeColor: AppColors.primary,
+                  inactiveTrackColor: Colors.grey[300],
+                  onChanged: (bool value) {
+                    setState(() {
+                      _isNotificationEnabled = value;
+                    });
+
+                    // Feedback visual sederhana
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          value
+                              ? "Notifikasi Diaktifkan"
+                              : "Notifikasi Dimatikan",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: value ? Colors.green : Colors.grey,
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+
+                    // TODO: Panggil fungsi untuk update preferensi ke Database/Local Storage
+                  },
+                ),
+                // onTap bisa dikosongkan agar user fokus menekan switch,
+                // atau diisi untuk toggle switch juga
                 onTap: () {
-                  // TODO: navigasi ke pengaturan notifikasi
+                  setState(() {
+                    _isNotificationEnabled = !_isNotificationEnabled;
+                  });
                 },
               ),
+
+              // 3. Menu Logout
               _buildMenuItem(
                 icon: Icons.logout,
                 text: "Logout",
@@ -135,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 20),
 
-              // Lencana
+              // --- BAGIAN LENCANA (BADGES) ---
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Row(
@@ -183,78 +235,91 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 15),
 
-              // Badge
+              // List Lencana
               if (achievementProvider.isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (achievementProvider.myAchievements.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(20),
-                  child: Text(
-                    "Belum ada lencana yang didapatkan.\nAyo mulai lari!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.emoji_events_outlined,
+                        size: 40,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Belum ada lencana.\nAyo selesaikan latihan!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
                 )
               else
                 SizedBox(
-                  height: 120, 
-                  child: Center(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: achievementProvider.myAchievements.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 20),
-                      itemBuilder: (context, index) {
-                        final item = achievementProvider.myAchievements[index];
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: 90,
-                              width: 80,
-                              child: Image.network(
-                                item.achievement.imageUrl,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.shield,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  );
-                                },
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      );
-                                    },
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                item.achievement.title,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                  height: 130, // Tinggi container badge
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: achievementProvider.myAchievements.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 20),
+                    itemBuilder: (context, index) {
+                      final item = achievementProvider.myAchievements[index];
+                      return Column(
+                        children: [
+                          Container(
+                            height: 80,
+                            width: 80,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
                                 ),
+                              ],
+                            ),
+                            child: Image.network(
+                              item.achievement.imageUrl,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.shield,
+                                  size: 40,
+                                  color: Colors.amber,
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: 80,
+                            child: Text(
+                              item.achievement.title,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -262,7 +327,90 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Modal Logout
+  // --- WIDGET HELPER ---
+
+  // 1. Info Statistik (Berat, Usia, Tinggi)
+  Widget _buildStatItem(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.white)),
+      ],
+    );
+  }
+
+  // 2. Garis Pemisah Putih
+  Widget _buildDivider() {
+    return Container(
+      height: 30,
+      width: 1,
+      color: Colors.white.withOpacity(0.5),
+    );
+  }
+
+  // 3. Item Menu (Updated with Trailing Widget)
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String text,
+    required Color color,
+    bool isLogout = false,
+    VoidCallback? onTap,
+    Widget? trailing, // Parameter baru untuk Custom Widget di kanan
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isLogout ? Colors.transparent : color,
+                shape: BoxShape.circle,
+                border: isLogout ? Border.all(color: color, width: 2) : null,
+              ),
+              child: Icon(
+                icon,
+                color: isLogout ? color : Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D2D2D),
+                ),
+              ),
+            ),
+
+            // Logic Penentuan Widget Kanan
+            if (trailing != null)
+              trailing // Tampilkan Switch jika ada
+            else if (!isLogout)
+              const Icon(
+                Icons.chevron_right,
+                color: Colors.grey,
+              ), // Default panah
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 4. Modal Konfirmasi Logout
   void _showLogoutConfirmation(BuildContext parentContext, Color primaryColor) {
     showModalBottomSheet(
       context: parentContext,
@@ -354,77 +502,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         );
       },
-    );
-  }
-
-  // Widget Informasi
-  Widget _buildStatItem(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.white)),
-      ],
-    );
-  }
-
-  // Garis
-  Widget _buildDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.white.withOpacity(0.5),
-    );
-  }
-
-  // Widget Menu
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String text,
-    required Color color,
-    bool isLogout = false,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isLogout ? Colors.transparent : color,
-                shape: BoxShape.circle,
-                border: isLogout ? Border.all(color: color, width: 2) : null,
-              ),
-              child: Icon(
-                icon,
-                color: isLogout ? color : Colors.white,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Text(
-              text,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF2D2D2D),
-              ),
-            ),
-            const Spacer(),
-            if (!isLogout) const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
-        ),
-      ),
     );
   }
 }
