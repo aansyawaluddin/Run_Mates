@@ -39,7 +39,7 @@ class LoginPage extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 4.0, bottom: 20.0),
                   ),
                   Text(
-                    'Your Personal Running Coach',
+                    'Pelatih Lari Pribadi Anda',
                     style: AppTextStyles.heading4(
                       weight: FontWeight.normal,
                       color: AppColors.textPrimary,
