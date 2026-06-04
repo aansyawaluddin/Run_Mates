@@ -9,7 +9,7 @@ class AITrainingService {
 
   String get apiKey => dotenv.env['AI_API_KEY'] ?? '';
 
-  final String model = 'gemini-2.5-flash';
+  final String model = 'gemini-2.5-flash-lite';
 
   Future<void> generateAndSavePlan({
     required String userId,

@@ -1,4 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart'; 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -21,18 +21,22 @@ class _NotificationPermissionScreenState
   Future<void> _submitAndGoNext(BuildContext context) async {
     final provider = context.read<RegistrationProvider>();
 
+    final navigator = Navigator.of(context);
+
     String? error = await provider.registerUser();
 
-    if (!mounted) return;
+    if (!mounted) return; 
 
     if (error == null) {
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const FinishPage()));
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (_) => const FinishPage()),
+      );
     } else {
+      if (!context.mounted) return;
+
       showDialog(
         context: context,
-        builder: (context) {
+        builder: (dialogContext) {
           return AlertDialog(
             backgroundColor: AppColors.textSecondary,
             shape: RoundedRectangleBorder(
@@ -58,7 +62,8 @@ class _NotificationPermissionScreenState
                 height: 45,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(dialogContext);
+                    _submitAndGoNext(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -118,8 +123,7 @@ class _NotificationPermissionScreenState
             content: const Text('Izin notifikasi ditolak.'),
             action: SnackBarAction(
               label: 'Buka Setting',
-              onPressed: () =>
-                  openAppSettings(), 
+              onPressed: () => openAppSettings(),
             ),
           ),
         );
