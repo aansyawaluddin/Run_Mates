@@ -11,6 +11,18 @@ class AITrainingService {
 
   final String model = 'gemini-2.5-flash-lite';
 
+  String _getWeekDescription(int weekNum, int daysPerWeek) {
+    const descriptions = {
+      1: 'Fondasi: Membangun kebiasaan & adaptasi tubuh',
+      2: 'Konsistensi: Meningkatkan durasi & daya tahan',
+      3: 'Pengembangan: Menambah jarak & intensitas',
+      4: 'Puncak: Latihan tertinggi sebelum tapering',
+      5: 'Race Week: Tapering & persiapan hari perlombaan',
+    };
+    return descriptions[weekNum] ??
+        'Minggu ke-$weekNum ($daysPerWeek hari latihan)';
+  }
+
   Future<void> generateAndSavePlan({
     required String userId,
     required int age,
@@ -64,6 +76,24 @@ class AITrainingService {
       'Minggu': 6,
     };
 
+    double racePaceDecimal = targetTime / targetDistance;
+    int racePaceMin = racePaceDecimal.floor();
+    int racePaceSec = ((racePaceDecimal - racePaceMin) * 60).round();
+    String racePaceStr =
+        "$racePaceMin:${racePaceSec.toString().padLeft(2, '0')}";
+
+    double easyPaceDecimal = racePaceDecimal + 1.25;
+    int easyPaceMin = easyPaceDecimal.floor();
+    int easyPaceSec = ((easyPaceDecimal - easyPaceMin) * 60).round();
+    String easyPaceStr =
+        "$easyPaceMin:${easyPaceSec.toString().padLeft(2, '0')}";
+
+    double longPaceDecimal = racePaceDecimal + 1.75;
+    int longPaceMin = longPaceDecimal.floor();
+    int longPaceSec = ((longPaceDecimal - longPaceMin) * 60).round();
+    String longPaceStr =
+        "$longPaceMin:${longPaceSec.toString().padLeft(2, '0')}";
+
     final String prompt =
         '''
       Berperanlah sebagai Pelatih Lari Profesional Khusus PEMULA.
@@ -85,17 +115,28 @@ class AITrainingService {
       1. Jika User Obese/Overweight: Minggu 1-2 HARUS fokus "Walk-Run" (Jalan-Lari). Jangan beri lari full.
       2. Key "title" gunakan bahasa Inggris baku (Easy Run, Long Run, Recovery Run, Rest Day).
       3. Hari kosong diisi: "Rest Day" atau "Strength Training".
+
+      === PACE SUDAH DIHITUNG — GUNAKAN NILAI INI, JANGAN HITUNG ULANG ===
+      - Race Pace (target pengguna): $racePaceStr min/km
+        (dihitung dari $targetTime menit ÷ $targetDistance km = $racePaceStr min/km)
+      - Easy Run pace: $easyPaceStr min/km (race pace + 75 detik, untuk sesi santai)
+      - Long Run pace: $longPaceStr min/km (race pace + 105 detik, untuk sesi panjang)
+      - Recovery Run: gunakan pace lebih lambat dari easy pace
+      - Race Day (minggu 5): WAJIB gunakan race pace $racePaceStr min/km
+      =====================================================================
       
       4. ***ATURAN KHUSUS DETAIL LATIHAN (WAJIB)***:
-         Pada key "steps" -> "main":
-         a. WAJIB menyertakan estimasi PACE dalam format angka "mm:ss min/km" (misal: pace 7:30 min/km).
-            - Hitung pace berdasarkan target user ($targetTime menit / $targetDistance km).
-            - Untuk Easy Run, tambahkan 60-90 detik lebih lambat dari race pace.
-         b. WAJIB mengakhiri kalimat dengan estimasi total jarak: "Total jarak: X km".
+         a. Field "duration" = total durasi sesi dalam menit. WAJIB diisi untuk SEMUA hari
+            termasuk Rest Day (isi 0) dan Race Day.
+         b. Pada key "steps" -> "main":
+            - Gunakan pace dari daftar di atas. JANGAN ubah nilainya.
+            - WAJIB tulis durasi segmen inti dengan format "selama X menit"
+              contoh: "selama 20 menit", "selama 30 menit".
+            - WAJIB mengakhiri kalimat dengan estimasi total jarak: "Total jarak: X km".
          
          Contoh Format yang BENAR:
-         - "Lari konstan (pace 7:30-8:00 min/km) selama 20 menit. Total jarak: 3.0 km"
-         - "Interval: Lari (pace 5:30 min/km) 2 menit, Jalan 2 menit. Ulangi 5x. Total jarak: 2.5 km"
+         - "Lari santai (pace $easyPaceStr min/km) selama 20 menit tanpa henti. Total jarak: 2.5 km"
+         - "Interval: Lari (pace $racePaceStr min/km) selama 2 menit, Jalan 2 menit. Ulangi 5x. Total jarak: 2.5 km"
 
       FORMAT OUTPUT WAJIB (JSON ARRAY):
       [
@@ -105,12 +146,12 @@ class AITrainingService {
             {
               "day": "Senin",
               "title": "Easy Run", 
-              "subtitle": "Membangun Aerobik",
+              "subtitle": "Membangun Aerobik Dasar",
               "objective": "Menjaga konsistensi pace.",
               "duration": 30,
               "steps": {
                  "warmup": "Jalan cepat 5 menit.",
-                 "main": "Lari santai (pace 8:00-8:30 min/km) selama 20 menit tanpa henti. Total jarak: 2.5 km",
+                 "main": "Lari santai (pace $easyPaceStr min/km) selama 20 menit tanpa henti. Total jarak: 2.5 km",
                  "cooldown": "Jalan kaki 5 menit."
               }
             },
@@ -157,7 +198,6 @@ class AITrainingService {
 
         String content = data['candidates'][0]['content']['parts'][0]['text'];
 
-        // Bersihkan Markdown
         content = content.replaceAll(
           RegExp(r'```json', caseSensitive: false),
           '',
@@ -187,8 +227,10 @@ class AITrainingService {
                 'user_id': userId,
                 'week_number': weekNum,
                 'title': weekNum == 5 ? 'Race Week' : 'Phase $weekNum',
-                'description':
-                    'Minggu ke-$weekNum. Fokus: ${weekItem['days'][0]['subtitle'] ?? 'Latihan'}',
+                'description': _getWeekDescription(
+                  weekNum,
+                  availableDays.length,
+                ),
               })
               .select()
               .single();

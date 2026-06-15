@@ -33,6 +33,25 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
         now.day == scheduleDate.day;
   }
 
+  String _parseMainDuration(String mainText) {
+    final RegExp pattern = RegExp(
+      r'selama\s+(\d+(?:[.,]\d+)?)\s+menit',
+      caseSensitive: false,
+    );
+    final match = pattern.firstMatch(mainText);
+    if (match != null) {
+      final rawNum = match.group(1)!.replaceAll(',', '.');
+      final double? parsed = double.tryParse(rawNum);
+      if (parsed != null) {
+        final display = parsed == parsed.truncateToDouble()
+            ? parsed.toInt().toString()
+            : parsed.toString();
+        return '($display Menit)';
+      }
+    }
+    return '(Inti)';
+  }
+
   Future<void> _handleFinishWorkout(BuildContext context) async {
     final provider = Provider.of<ProgramProvider>(context, listen: false);
 
@@ -122,6 +141,7 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
               ),
               const SizedBox(height: 20),
 
+              // Hero image banner
               Container(
                 height: 164,
                 width: double.infinity,
@@ -244,11 +264,11 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                         color: AppColors.textPrimary,
                       ),
                     ),
-
                     const SizedBox(width: 82),
-
                     Text(
-                      '${widget.schedule.durationMinutes} menit',
+                      widget.schedule.durationMinutes > 0
+                          ? '${widget.schedule.durationMinutes} menit'
+                          : 'Rest Day',
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 20,
@@ -292,7 +312,7 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 if (main != null && main.isNotEmpty)
                   _buildStepCard(
                     title: '2. Latihan Inti',
-                    duration: '(${widget.schedule.durationMinutes} Menit)',
+                    duration: _parseMainDuration(main),
                     description: main,
                     iconPath: 'assets/icons/run_icon.png',
                     fallbackIcon: Icons.directions_run,
@@ -349,7 +369,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
     );
   }
 
-  // Widget Card Langkah
   Widget _buildStepCard({
     required String title,
     required String duration,
