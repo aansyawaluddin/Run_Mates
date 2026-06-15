@@ -33,14 +33,64 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
         now.day == scheduleDate.day;
   }
 
-  String _parseMainDuration(String mainText) {
-    final RegExp pattern = RegExp(
-      r'selama\s+(\d+(?:[.,]\d+)?)\s+menit',
+  String _parseDuration(String text, String fallback) {
+    // PATTERN 1: Format Interval "Nx ... selama Y menit, ... Z detik"
+    final RegExp intervalPattern = RegExp(
+      r'(\d+)\s*x\s+.*?selama\s+(\d+(?:[.,]\d+)?)\s+menit.*?(\d+)\s+detik',
+      caseSensitive: false,
+      dotAll: true,
+    );
+    final intervalMatch = intervalPattern.firstMatch(text);
+    if (intervalMatch != null) {
+      final int? reps = int.tryParse(intervalMatch.group(1)!);
+      final double? runMin = double.tryParse(
+        intervalMatch.group(2)!.replaceAll(',', '.'),
+      );
+      final int? restSec = int.tryParse(intervalMatch.group(3)!);
+
+      if (reps != null && runMin != null && restSec != null) {
+        final double totalRun = reps * runMin;
+        final double totalRest = ((reps - 1) * restSec) / 60.0;
+        final double total = totalRun + totalRest;
+
+        final display = total == total.truncateToDouble()
+            ? total.toInt().toString()
+            : total.toStringAsFixed(1);
+        return '($display Menit)';
+      }
+    }
+
+    // PATTERN 2: Race Day "Lari X km dengan target pace Y:Z min/km"
+    final RegExp racePattern = RegExp(
+      r'lari\s+(\d+(?:[.,]\d+)?)\s+km\s+dengan\s+target\s+pace\s+(\d+):(\d+)',
       caseSensitive: false,
     );
-    final match = pattern.firstMatch(mainText);
-    if (match != null) {
-      final rawNum = match.group(1)!.replaceAll(',', '.');
+    final raceMatch = racePattern.firstMatch(text);
+    if (raceMatch != null) {
+      final double? km = double.tryParse(
+        raceMatch.group(1)!.replaceAll(',', '.'),
+      );
+      final int? paceMin = int.tryParse(raceMatch.group(2)!);
+      final int? paceSec = int.tryParse(raceMatch.group(3)!);
+
+      if (km != null && paceMin != null && paceSec != null) {
+        final double paceDecimal = paceMin + (paceSec / 60.0);
+        final double total = km * paceDecimal;
+        final display = total == total.truncateToDouble()
+            ? total.toInt().toString()
+            : total.toStringAsFixed(1);
+        return '($display Menit)';
+      }
+    }
+
+    // PATTERN 3: "Total: X menit"
+    final RegExp totalPattern = RegExp(
+      r'total[:\s]+(\d+(?:[.,]\d+)?)\s*menit',
+      caseSensitive: false,
+    );
+    final totalMatch = totalPattern.firstMatch(text);
+    if (totalMatch != null) {
+      final rawNum = totalMatch.group(1)!.replaceAll(',', '.');
       final double? parsed = double.tryParse(rawNum);
       if (parsed != null) {
         final display = parsed == parsed.truncateToDouble()
@@ -49,7 +99,42 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
         return '($display Menit)';
       }
     }
-    return '(Inti)';
+
+    // PATTERN 4: "selama X menit"
+    final RegExp selamaPattern = RegExp(
+      r'selama\s+(\d+(?:[.,]\d+)?)\s+menit',
+      caseSensitive: false,
+    );
+    final selamaMatch = selamaPattern.firstMatch(text);
+    if (selamaMatch != null) {
+      final rawNum = selamaMatch.group(1)!.replaceAll(',', '.');
+      final double? parsed = double.tryParse(rawNum);
+      if (parsed != null) {
+        final display = parsed == parsed.truncateToDouble()
+            ? parsed.toInt().toString()
+            : parsed.toString();
+        return '($display Menit)';
+      }
+    }
+
+    // PATTERN 5 (fallback): "X menit" pertama
+    final RegExp anyPattern = RegExp(
+      r'(\d+(?:[.,]\d+)?)\s+menit',
+      caseSensitive: false,
+    );
+    final anyMatch = anyPattern.firstMatch(text);
+    if (anyMatch != null) {
+      final rawNum = anyMatch.group(1)!.replaceAll(',', '.');
+      final double? parsed = double.tryParse(rawNum);
+      if (parsed != null) {
+        final display = parsed == parsed.truncateToDouble()
+            ? parsed.toInt().toString()
+            : parsed.toString();
+        return '($display Menit)';
+      }
+    }
+
+    return fallback;
   }
 
   Future<void> _handleFinishWorkout(BuildContext context) async {
@@ -300,28 +385,31 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 ),
                 const SizedBox(height: 15),
 
+                // ✅ Diubah: pakai _parseDuration dengan fallback '(Awal)'
                 if (warmup != null && warmup.isNotEmpty)
                   _buildStepCard(
                     title: '1. Pemanasan',
-                    duration: '(Awal)',
+                    duration: _parseDuration(warmup, '(Awal)'),
                     description: warmup,
                     iconPath: 'assets/icons/warmup_icon.png',
                     fallbackIcon: Icons.accessibility_new,
                   ),
 
+                // ✅ Diubah: pakai _parseDuration dengan fallback '(Inti)'
                 if (main != null && main.isNotEmpty)
                   _buildStepCard(
                     title: '2. Latihan Inti',
-                    duration: _parseMainDuration(main),
+                    duration: _parseDuration(main, '(Inti)'),
                     description: main,
                     iconPath: 'assets/icons/run_icon.png',
                     fallbackIcon: Icons.directions_run,
                   ),
 
+                // ✅ Diubah: pakai _parseDuration dengan fallback '(Akhir)'
                 if (cooldown != null && cooldown.isNotEmpty)
                   _buildStepCard(
                     title: '3. Pendinginan',
-                    duration: '(Akhir)',
+                    duration: _parseDuration(cooldown, '(Akhir)'),
                     description: cooldown,
                     iconPath: 'assets/icons/cooldown_icon.png',
                     fallbackIcon: Icons.self_improvement,
@@ -336,9 +424,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                   onPressed: (_isFinished || !_isToday)
                       ? null
                       : () => _handleFinishWorkout(context),
-                  // onPressed: _isFinished
-                  //     ? null
-                  //     : () => _handleFinishWorkout(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
