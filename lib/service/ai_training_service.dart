@@ -234,14 +234,10 @@ class AITrainingService {
     String intervalW4 = _addSeconds(racePaceDecimal, -5);
 
     String distEasyW1 = _estimateDistance(easyPaceDecimal + 0.5, 20);
-    String distEasyW2 = _estimateDistance(easyPaceDecimal + 0.25, 25);
     String distEasyW3 = _estimateDistance(easyPaceDecimal, 30);
-    String distEasyW4 = _estimateDistance(easyPaceDecimal - 0.17, 30);
 
     String distLongW1 = _estimateDistance(longPaceDecimal + 0.5, 40);
-    String distLongW2 = _estimateDistance(longPaceDecimal + 0.25, 50);
     String distLongW3 = _estimateDistance(longPaceDecimal, 60);
-    String distLongW4 = _estimateDistance(longPaceDecimal - 0.17, 70);
 
     final String prompt =
         '''

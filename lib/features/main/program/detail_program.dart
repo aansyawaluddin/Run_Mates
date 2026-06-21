@@ -19,18 +19,35 @@ class ProgramDetailPage extends StatefulWidget {
 class _ProgramDetailPageState extends State<ProgramDetailPage> {
   bool _isFinished = false;
   bool _isToday = false;
+  bool _isMissed = false;
+  bool _isRest = false;
 
   @override
   void initState() {
     super.initState();
     _isFinished = widget.schedule.isDone;
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final scheduleDate = widget.schedule.scheduledDate;
+    final scheduleDateOnly = DateTime(
+      scheduleDate.year,
+      scheduleDate.month,
+      scheduleDate.day,
+    );
 
     _isToday =
         now.year == scheduleDate.year &&
         now.month == scheduleDate.month &&
         now.day == scheduleDate.day;
+
+    _isRest = widget.schedule.workoutTitle.toLowerCase().contains('rest');
+    final bool isPast = scheduleDateOnly.isBefore(today);
+
+    if (_isRest && isPast) {
+      _isFinished = true;
+    }
+
+    _isMissed = !_isFinished && !_isRest && isPast;
   }
 
   String _parseDuration(String text, String fallback) {
@@ -385,7 +402,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // ✅ Diubah: pakai _parseDuration dengan fallback '(Awal)'
                 if (warmup != null && warmup.isNotEmpty)
                   _buildStepCard(
                     title: '1. Pemanasan',
@@ -395,7 +411,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                     fallbackIcon: Icons.accessibility_new,
                   ),
 
-                // ✅ Diubah: pakai _parseDuration dengan fallback '(Inti)'
                 if (main != null && main.isNotEmpty)
                   _buildStepCard(
                     title: '2. Latihan Inti',
@@ -405,7 +420,6 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                     fallbackIcon: Icons.directions_run,
                   ),
 
-                // ✅ Diubah: pakai _parseDuration dengan fallback '(Akhir)'
                 if (cooldown != null && cooldown.isNotEmpty)
                   _buildStepCard(
                     title: '3. Pendinginan',
@@ -425,18 +439,24 @@ class _ProgramDetailPageState extends State<ProgramDetailPage> {
                       ? null
                       : () => _handleFinishWorkout(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                    backgroundColor: _isMissed
+                        ? Colors.grey.shade600
+                        : AppColors.primary,
+                    disabledBackgroundColor: _isMissed
+                        ? Colors.grey.shade600
+                        : AppColors.primary.withOpacity(0.5),
                     disabledForegroundColor: Colors.white.withOpacity(0.8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    elevation: _isFinished ? 0 : 5,
+                    elevation: (_isFinished || _isMissed) ? 0 : 5,
                     shadowColor: AppColors.primary.withOpacity(0.4),
                   ),
                   child: Text(
                     _isFinished
                         ? 'Sudah Selesai'
+                        : _isMissed
+                        ? 'Sudah Terlewat'
                         : (_isToday ? 'Selesai' : 'Belum Jadwalnya'),
                     style: const TextStyle(
                       color: Colors.white,

@@ -22,12 +22,16 @@ class ProgramDayPage extends StatefulWidget {
 }
 
 class _ProgramDayPageState extends State<ProgramDayPage> {
+  static const Color _successColor = Color(0xFF22C55E);
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProgramProvider>(context, listen: false)
-          .fetchDailySchedules(widget.weekId);
+      Provider.of<ProgramProvider>(
+        context,
+        listen: false,
+      ).fetchDailySchedules(widget.weekId);
     });
   }
 
@@ -38,9 +42,11 @@ class _ProgramDayPageState extends State<ProgramDayPage> {
       body: SafeArea(
         child: Column(
           children: [
-
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 18.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32.0,
+                vertical: 18.0,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -88,26 +94,49 @@ class _ProgramDayPageState extends State<ProgramDayPage> {
                   }
 
                   if (provider.dailySchedules.isEmpty) {
-                    return const Center(child: Text("Tidak ada jadwal latihan."));
+                    return const Center(
+                      child: Text("Tidak ada jadwal latihan."),
+                    );
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32.0,
+                      vertical: 8.0,
+                    ),
                     itemCount: provider.dailySchedules.length,
                     itemBuilder: (context, index) {
                       final schedule = provider.dailySchedules[index];
-                      
+
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+                      final scheduleDate = DateTime(
+                        schedule.scheduledDate.year,
+                        schedule.scheduledDate.month,
+                        schedule.scheduledDate.day,
+                      );
+
+                      final String title = schedule.workoutTitle;
+                      final bool isRest = title.toLowerCase().contains('rest');
+                      final bool isPast = scheduleDate.isBefore(today);
+
+                      final bool isCompleted =
+                          schedule.isDone || (isRest && isPast);
+
+                      final bool isMissed =
+                          !schedule.isDone && !isRest && isPast;
+
                       return _buildWorkoutCard(
                         context: context,
                         day: schedule.dayName,
-                        title: schedule.workoutTitle,
-                        isCompleted: schedule.isDone,
+                        title: title,
+                        isCompleted: isCompleted,
+                        isMissed: isMissed,
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => ProgramDetailPage(
-                                schedule: schedule, 
-                              ),
+                              builder: (context) =>
+                                  ProgramDetailPage(schedule: schedule),
                             ),
                           );
                         },
@@ -128,61 +157,101 @@ class _ProgramDayPageState extends State<ProgramDayPage> {
     required String day,
     required String title,
     required bool isCompleted,
+    required bool isMissed,
     required VoidCallback onTap,
   }) {
-    final Color cardColor = isCompleted ? AppColors.primary : Colors.white;
-    final Color textColor = isCompleted ? Colors.white : AppColors.primary;
-    final Border? border = isCompleted
-        ? null
-        : Border.all(color: AppColors.primary, width: 1.5);
+    late Color cardColor;
+    late Color textColor;
+    Border? border;
+    Widget? trailingIcon;
+    List<BoxShadow> shadows = [];
+
+    if (isCompleted) {
+      cardColor = _successColor;
+      textColor = Colors.white;
+      border = null;
+      trailingIcon = const Icon(
+        Icons.check_circle,
+        color: Colors.white,
+        size: 30,
+      );
+      shadows = [
+        BoxShadow(
+          color: _successColor.withOpacity(0.4),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: const Offset(0, 3),
+        ),
+      ];
+    } else if (isMissed) {
+      cardColor = AppColors.primary;
+      textColor = Colors.white;
+      border = null;
+      trailingIcon = const Icon(Icons.cancel, color: Colors.white, size: 30);
+      shadows = [
+        BoxShadow(
+          color: AppColors.primary.withOpacity(0.4),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: const Offset(0, 3),
+        ),
+      ];
+    } else {
+      cardColor = Colors.white;
+      textColor = AppColors.primary;
+      border = Border.all(color: AppColors.primary, width: 1.5);
+      trailingIcon = null;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: GestureDetector(
         onTap: isCompleted ? null : onTap,
         child: Container(
-          height: 115,
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 13.0),
+          constraints: const BoxConstraints(minHeight: 115),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(15),
             border: border,
-            boxShadow: [
-              if (isCompleted)
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.4),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-            ],
+            boxShadow: shadows,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    day,
-                    style: AppTextStyles.heading4(
-                      weight: FontWeight.bold,
-                      color: textColor,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      day,
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    title,
-                    style: AppTextStyles.heading4(
-                      weight: FontWeight.bold,
-                      color: textColor,
+                    const SizedBox(height: 4),
+                    Text(
+                      title,
+                      style: AppTextStyles.heading4(
+                        weight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              if (isCompleted)
-                const Icon(Icons.check_circle, color: Colors.white, size: 30),
+              if (trailingIcon != null) ...[
+                const SizedBox(width: 12),
+                trailingIcon,
+              ],
             ],
           ),
         ),

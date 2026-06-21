@@ -21,12 +21,23 @@ class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  final PageController _weeklyController = PageController();
+  int _currentWeekPage = 0;
+
+  static const Color _successColor = Color(0xFF22C55E);
+
   @override
   void initState() {
     super.initState();
     _pageController.addListener(() {
       setState(() {
         _currentPage = _pageController.page?.round() ?? 0;
+      });
+    });
+
+    _weeklyController.addListener(() {
+      setState(() {
+        _currentWeekPage = _weeklyController.page?.round() ?? 0;
       });
     });
 
@@ -37,7 +48,8 @@ class _HomePageState extends State<HomePage> {
       context.read<TipsProvider>().fetchTips();
       programProvider.fetchProgramProgress();
       programProvider.fetchTodaySchedule();
-      programProvider.fetchWeeklyProgress();
+      programProvider.fetchAllWeeksProgress();
+
       final bool isPenaltyApplied = await programProvider
           .checkAndApplyPenalty();
 
@@ -54,7 +66,6 @@ class _HomePageState extends State<HomePage> {
     if (lastShownDate != todayDate) {
       if (context.mounted) {
         _showPenaltyDialog(context);
-
         await prefs.setString('penalty_popup_shown_date', todayDate);
       }
     }
@@ -104,9 +115,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text(
                   'Siap, Laksanakan!',
                   style: TextStyle(
@@ -125,13 +134,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _pageController.dispose();
+    _weeklyController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final double bottomSpacing = MediaQuery.of(context).padding.bottom;
-
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.currentUser;
     final tipsProvider = context.watch<TipsProvider>();
@@ -226,21 +235,18 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildPageIndicator(tipsProvider.tips.length),
+                    _buildPageIndicator(tipsProvider.tips.length, _currentPage),
                   ],
                 ),
               const SizedBox(height: 24),
 
-              // card latihan hari ini
               _buildTodayActivityCard(context),
               const SizedBox(height: 20),
 
-              // card program lari
               _buildProgramCard(context),
               const SizedBox(height: 20),
 
-              // card progress minggu ini
-              _buildWeeklyProgressCard(context),
+              _buildWeeklyProgressPageView(context),
               const SizedBox(height: 20),
             ],
           ),
@@ -249,7 +255,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // card tips
   Widget tipsCardPage({required String imageUrl, required String title}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -322,19 +327,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPageIndicator(int numPages) {
+  Widget _buildPageIndicator(int numPages, int currentIndex) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(numPages, (index) {
-        return Container(
-          width: 8.0,
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: currentIndex == index ? 20.0 : 8.0,
           height: 8.0,
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          margin: const EdgeInsets.symmetric(horizontal: 3.0),
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _currentPage == index
+            borderRadius: BorderRadius.circular(4),
+            color: currentIndex == index
                 ? AppColors.primary
-                : Colors.grey.shade700,
+                : Colors.grey.shade400,
           ),
         );
       }),
@@ -475,7 +481,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 12),
-
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -516,7 +521,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // card program lari
   Widget _buildProgramCard(BuildContext context) {
     final programProvider = context.watch<ProgramProvider>();
     final authProvider = context.watch<AuthProvider>();
@@ -546,7 +550,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 4),
-
           programProvider.isProgressLoading
               ? SizedBox(
                   height: 20,
@@ -563,9 +566,7 @@ class _HomePageState extends State<HomePage> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-
           const SizedBox(height: 16),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -586,7 +587,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 8),
-
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
@@ -603,21 +603,68 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // card progress minggu ini
-  Widget _buildWeeklyProgressCard(BuildContext context) {
+  Widget _buildWeeklyProgressPageView(BuildContext context) {
     final programProvider = context.watch<ProgramProvider>();
-    final finished = programProvider.completedSessionsThisWeek;
-    final total = programProvider.totalSessionsThisWeek;
-    final durationStr = programProvider.totalDurationFormatted;
-    final distanceStr = programProvider.totalDistanceThisWeek.toStringAsFixed(
-      1,
-    );
 
-    // Ambil nomor minggu dari Provider (pastikan Anda sudah update Providernya)
-    // Jika belum update Provider, ganti ini dengan angka default/dummy dulu
-    final currentWeek = programProvider.currentWeekNumber;
+    if (programProvider.isAllWeeksLoading) {
+      return Container(
+        height: 280,
+        decoration: BoxDecoration(
+          color: AppColors.mutedCardBg,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final weeksData = programProvider.allWeeksProgress;
+    if (weeksData.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.mutedCardBg,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: const Center(child: Text('Belum ada data progress.')),
+      );
+    }
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 320,
+          child: PageView.builder(
+            controller: _weeklyController,
+            itemCount: weeksData.length,
+            itemBuilder: (context, index) {
+              return _buildWeeklyProgressCard(context, weeksData[index]);
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildPageIndicator(weeksData.length, _currentWeekPage),
+      ],
+    );
+  }
+
+  Widget _buildWeeklyProgressCard(
+    BuildContext context,
+    Map<String, dynamic> weekData,
+  ) {
+    final programProvider = context.read<ProgramProvider>();
+
+    final int weekNumber = weekData['weekNumber'];
+    final int finished = weekData['completedSessions'];
+    final int total = weekData['totalSessions'];
+    final int totalDurationMin = weekData['totalDurationMinutes'];
+    final double totalDistance = weekData['totalDistance'];
+    final schedules = weekData['schedules'];
+
+    final distanceStr = totalDistance.toStringAsFixed(1);
+    final durationStr = programProvider.formatHoursMinutes(totalDurationMin);
 
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.mutedCardBg,
@@ -627,67 +674,36 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Progress Minggu $currentWeek',
+            'Progress Minggu $weekNumber',
             style: AppTextStyles.heading4(
               weight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
-
-          programProvider.isWeeklyLoading
-              ? const Center(
-                  child: LinearProgressIndicator(color: AppColors.primary),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildStatCard(distanceStr, 'KM'),
-                    _buildStatCard('$finished/$total', 'Sesi'),
-                    _buildStatCard(durationStr, 'Jam'),
-                  ],
-                ),
-
-          const SizedBox(height: 16),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildDayIndicator(
-                'S',
-                status: programProvider.getDayStatus(1),
-              ), // Senin
-              _buildDayIndicator(
-                'S',
-                status: programProvider.getDayStatus(2),
-              ), // Selasa
-              _buildDayIndicator(
-                'R',
-                status: programProvider.getDayStatus(3),
-              ), // Rabu
-              _buildDayIndicator(
-                'K',
-                status: programProvider.getDayStatus(4),
-              ), // Kamis
-              _buildDayIndicator(
-                'J',
-                status: programProvider.getDayStatus(5),
-              ), // Jumat
-              _buildDayIndicator(
-                'S',
-                status: programProvider.getDayStatus(6),
-              ), // Sabtu
-              _buildDayIndicator(
-                'M',
-                status: programProvider.getDayStatus(7),
-              ), // Minggu
+              _buildStatCard(distanceStr, 'KM'),
+              _buildStatCard('$finished/$total', 'Sesi'),
+              _buildStatCard(durationStr, 'Jam'),
             ],
           ),
-
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(7, (i) {
+              final weekday = i + 1; 
+              final labels = ['S', 'S', 'R', 'K', 'J', 'S', 'M'];
+              return _buildDayIndicator(
+                labels[i],
+                status: programProvider.getDayStatusForWeek(schedules, weekday),
+              );
+            }),
+          ),
           const SizedBox(height: 16),
           const Divider(color: Colors.white),
           const SizedBox(height: 8),
-
           Row(
             children: [
               const Icon(Icons.trending_up, color: AppColors.primary, size: 20),
@@ -722,7 +738,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // card statistik
   Widget _buildStatCard(String value, String unit) {
     return Container(
       width: MediaQuery.of(context).size.width / 3.8,
@@ -753,7 +768,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // indikator hari
   Widget _buildDayIndicator(String day, {required int status}) {
     Color circleColor = Colors.transparent;
     Widget child = Text(
@@ -771,10 +785,10 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     } else if (status == 2) {
-      circleColor = AppColors.primary;
+      circleColor = _successColor;
       child = const Icon(Icons.check, color: Colors.white, size: 16);
     } else if (status == 3) {
-      circleColor = Colors.red;
+      circleColor = AppColors.primary;
       child = const Icon(Icons.close, color: Colors.white, size: 16);
     }
 

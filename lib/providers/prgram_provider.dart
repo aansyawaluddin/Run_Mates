@@ -135,20 +135,44 @@ class ProgramProvider extends ChangeNotifier {
 
       _totalWeeks = weeksCount;
 
-      final totalWorkoutsCount = await _supabase
+      final allSchedulesResponse = await _supabase
           .schema('runmates')
           .from('daily_schedules')
-          .count(CountOption.exact)
+          .select('scheduled_date, workout_title, is_done')
           .eq('user_id', userId);
 
-      _totalWorkouts = totalWorkoutsCount;
+      final List<dynamic> allSchedules = allSchedulesResponse;
+      _totalWorkouts = allSchedules.length;
 
-      final completedCount = await _supabase
-          .schema('runmates')
-          .from('daily_schedules')
-          .count(CountOption.exact)
-          .eq('user_id', userId)
-          .eq('is_done', true);
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      int completedCount = 0;
+      for (var s in allSchedules) {
+        final isDone = s['is_done'] == true;
+        final title = (s['workout_title'] ?? '').toString().toLowerCase();
+        final isRest = title.contains('rest');
+
+        final dateStr = s['scheduled_date']?.toString() ?? '';
+        DateTime? scheduleDate;
+        try {
+          scheduleDate = DateTime.parse(dateStr);
+        } catch (_) {
+          scheduleDate = null;
+        }
+
+        final isPast =
+            scheduleDate != null &&
+            DateTime(
+              scheduleDate.year,
+              scheduleDate.month,
+              scheduleDate.day,
+            ).isBefore(today);
+
+        if (isDone || (isRest && isPast)) {
+          completedCount++;
+        }
+      }
 
       _completedWorkouts = completedCount;
     } catch (e) {
@@ -260,22 +284,19 @@ class ProgramProvider extends ChangeNotifier {
         (s) => s.scheduledDate.weekday == weekday,
       );
 
-      if (schedule.isDone) {
-        return 2;
-      }
-
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-
       final scheduleDate = DateTime(
         schedule.scheduledDate.year,
         schedule.scheduledDate.month,
         schedule.scheduledDate.day,
       );
+      final isRest = schedule.workoutTitle.toLowerCase().contains('rest');
+      final isPast = scheduleDate.isBefore(today);
 
-      if (scheduleDate.isBefore(today)) {
-        return 3;
-      }
+      if (schedule.isDone || (isRest && isPast)) return 2;
+
+      if (isPast && !isRest) return 3;
 
       return 1;
     } catch (e) {
@@ -414,110 +435,378 @@ class ProgramProvider extends ChangeNotifier {
       final todayStr =
           "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
+      // Hitung sesi yang terlewat (kecuali Rest Day)
       final missedResponse = await _supabase
           .schema('runmates')
           .from('daily_schedules')
-          .select('id')
+          .select('id, workout_title')
           .eq('user_id', userId)
           .lt('scheduled_date', todayStr)
           .eq('is_done', false);
 
-      final int missedCount = (missedResponse as List).length;
+      final List<dynamic> missedList = missedResponse;
+      // Filter: Rest Day tidak dihitung sebagai "missed"
+      final missedCount = missedList.where((item) {
+        final title = (item['workout_title'] ?? '').toString().toLowerCase();
+        return !title.contains('rest');
+      }).length;
 
-      if (missedCount >= 2) {
-        final nextWorkoutResponse = await _supabase
+      if (missedCount < 2) return false;
+
+      // Cari sesi berikutnya yang belum selesai DAN bukan Rest Day / Race Day
+      final nextWorkoutResponse = await _supabase
+          .schema('runmates')
+          .from('daily_schedules')
+          .select()
+          .eq('user_id', userId)
+          .gte('scheduled_date', todayStr)
+          .eq('is_done', false)
+          .order('scheduled_date', ascending: true)
+          .limit(10); // ambil 10 sesi terdekat untuk filter
+
+      final List<dynamic> candidates = nextWorkoutResponse;
+      Map<String, dynamic>? targetWorkout;
+
+      for (var workout in candidates) {
+        final title = (workout['workout_title'] ?? '').toString().toLowerCase();
+        // Skip Rest Day, Race Day, Shakeout (tapering), dan yang sudah Extra Load
+        if (title.contains('rest') ||
+            title.contains('race') ||
+            title.contains('shakeout') ||
+            title.contains('extra load')) {
+          continue;
+        }
+        targetWorkout = Map<String, dynamic>.from(workout);
+        break;
+      }
+
+      if (targetWorkout == null) return false;
+
+      final String currentTitle = (targetWorkout['workout_title'] ?? '')
+          .toString();
+      final Map<String, dynamic> currentSteps = Map<String, dynamic>.from(
+        targetWorkout['steps'] ?? {},
+      );
+      String mainStep = currentSteps['main']?.toString() ?? '';
+
+      final lowerTitle = currentTitle.toLowerCase();
+
+      // ── STRATEGI PENALTI BERDASARKAN TIPE SESI ──
+
+      if (lowerTitle.contains('interval')) {
+        // Format: "8x pengulangan lari cepat ... selama 1 menit, diselingi jalan santai 90 detik..."
+        // Tambah 2 repetisi
+        final intervalRegex = RegExp(
+          r'(\d+)(x\s+pengulangan)',
+          caseSensitive: false,
+        );
+        final intervalMatch = intervalRegex.firstMatch(mainStep);
+        if (intervalMatch != null) {
+          final reps = int.tryParse(intervalMatch.group(1)!) ?? 0;
+          if (reps > 0) {
+            final newReps = reps + 2;
+            mainStep = mainStep.replaceFirst(
+              intervalRegex,
+              '${newReps}x pengulangan',
+            );
+
+            // Update "Total jarak: X km" dengan proporsi reps baru
+            final jarakRegex = RegExp(
+              r'total\s+jarak[:\s]+(\d+(?:\.\d+)?)\s*km',
+              caseSensitive: false,
+            );
+            final jarakMatch = jarakRegex.firstMatch(mainStep);
+            if (jarakMatch != null) {
+              final oldKm = double.tryParse(jarakMatch.group(1)!) ?? 0;
+              final newKm = (oldKm / reps * newReps).toStringAsFixed(1);
+              mainStep = mainStep.replaceFirst(
+                jarakRegex,
+                'Total jarak: $newKm km',
+              );
+            }
+          }
+        }
+      } else if (lowerTitle.contains('strength')) {
+        // Format Strength: "Squats 3 set x 12 reps ... Estimasi total: 25 menit"
+        // Tambah 5 menit di estimasi total
+        final estimasiRegex = RegExp(
+          r'estimasi\s+total[:\s]+(\d+)\s*menit',
+          caseSensitive: false,
+        );
+        final estimasiMatch = estimasiRegex.firstMatch(mainStep);
+        if (estimasiMatch != null) {
+          final oldMin = int.tryParse(estimasiMatch.group(1)!) ?? 0;
+          final newMin = oldMin + 5;
+          mainStep = mainStep.replaceFirst(
+            estimasiRegex,
+            'Estimasi total: $newMin menit',
+          );
+        }
+      } else {
+        // Easy Run, Long Run, Recovery Run, Fartlek dll
+        // Format: "...selama X menit... Total jarak: Y km"
+        // Tambah 5 menit di "selama"
+        final selamaRegex = RegExp(
+          r'selama\s+(\d+(?:\.\d+)?)\s+menit',
+          caseSensitive: false,
+        );
+        final selamaMatch = selamaRegex.firstMatch(mainStep);
+        if (selamaMatch != null) {
+          final oldMin = double.tryParse(selamaMatch.group(1)!) ?? 0;
+          final newMin = oldMin + 5;
+          final displayMin = newMin == newMin.truncateToDouble()
+              ? newMin.toInt().toString()
+              : newMin.toString();
+          mainStep = mainStep.replaceFirst(
+            selamaRegex,
+            'selama $displayMin menit',
+          );
+
+          // Update "Total jarak: X km" proporsional
+          final jarakRegex = RegExp(
+            r'total\s+jarak[:\s]+(\d+(?:\.\d+)?)\s*km',
+            caseSensitive: false,
+          );
+          final jarakMatch = jarakRegex.firstMatch(mainStep);
+          if (jarakMatch != null && oldMin > 0) {
+            final oldKm = double.tryParse(jarakMatch.group(1)!) ?? 0;
+            final newKm = (oldKm / oldMin * newMin).toStringAsFixed(1);
+            mainStep = mainStep.replaceFirst(
+              jarakRegex,
+              'Total jarak: $newKm km',
+            );
+          }
+        }
+      }
+
+      currentSteps['main'] = mainStep;
+
+      // Hitung ulang durasi total dari steps (warmup + main + cooldown)
+      final newDuration = _recalculateDuration(currentSteps);
+
+      await _supabase
+          .schema('runmates')
+          .from('daily_schedules')
+          .update({
+            'workout_title': '$currentTitle (Extra Load)',
+            'duration_minutes': newDuration,
+            'steps': currentSteps,
+            'workout_objective':
+                'Beban latihan ditingkatkan karena kamu melewatkan $missedCount sesi latihan. Ayo kejar ketertinggalan!',
+          })
+          .eq('id', targetWorkout['id']);
+
+      fetchTodaySchedule();
+      fetchWeeklyProgress();
+
+      return true;
+    } catch (e) {
+      debugPrint("Error applying penalty: $e");
+      return false;
+    }
+  }
+
+  // Helper untuk recalculate durasi (sama dengan logic di AITrainingService)
+  int _recalculateDuration(Map<String, dynamic> steps) {
+    int extractTotal(String text) {
+      final p = RegExp(
+        r'total[:\s]+(\d+(?:[.,]\d+)?)\s*menit',
+        caseSensitive: false,
+      );
+      final m = p.firstMatch(text);
+      if (m != null) {
+        final n = double.tryParse(m.group(1)!.replaceAll(',', '.'));
+        if (n != null) return n.round();
+      }
+      return 0;
+    }
+
+    int extractMain(String text) {
+      // Interval
+      final intP = RegExp(
+        r'(\d+)\s*x\s+.*?selama\s+(\d+(?:[.,]\d+)?)\s+menit.*?(\d+)\s+detik',
+        caseSensitive: false,
+        dotAll: true,
+      );
+      final intM = intP.firstMatch(text);
+      if (intM != null) {
+        final reps = int.tryParse(intM.group(1)!);
+        final runMin = double.tryParse(intM.group(2)!.replaceAll(',', '.'));
+        final restSec = int.tryParse(intM.group(3)!);
+        if (reps != null && runMin != null && restSec != null) {
+          final total = (reps * runMin) + ((reps - 1) * restSec / 60.0);
+          return total.round();
+        }
+      }
+
+      // Strength
+      final esP = RegExp(
+        r'estimasi\s+total[:\s]+(\d+(?:[.,]\d+)?)\s*menit',
+        caseSensitive: false,
+      );
+      final esM = esP.firstMatch(text);
+      if (esM != null) {
+        final n = double.tryParse(esM.group(1)!.replaceAll(',', '.'));
+        if (n != null) return n.round();
+      }
+
+      // Race Day
+      final raceP = RegExp(
+        r'lari\s+(\d+(?:[.,]\d+)?)\s+km\s+dengan\s+target\s+pace\s+(\d+):(\d+)',
+        caseSensitive: false,
+      );
+      final raceM = raceP.firstMatch(text);
+      if (raceM != null) {
+        final km = double.tryParse(raceM.group(1)!.replaceAll(',', '.'));
+        final pMin = int.tryParse(raceM.group(2)!);
+        final pSec = int.tryParse(raceM.group(3)!);
+        if (km != null && pMin != null && pSec != null) {
+          final pDec = pMin + (pSec / 60.0);
+          return (km * pDec).round();
+        }
+      }
+
+      // Lari biasa
+      final selP = RegExp(
+        r'selama\s+(\d+(?:[.,]\d+)?)\s+menit',
+        caseSensitive: false,
+      );
+      final selM = selP.firstMatch(text);
+      if (selM != null) {
+        final n = double.tryParse(selM.group(1)!.replaceAll(',', '.'));
+        if (n != null) return n.round();
+      }
+
+      return 0;
+    }
+
+    final w = (steps['warmup'] ?? '').toString();
+    final m = (steps['main'] ?? '').toString();
+    final c = (steps['cooldown'] ?? '').toString();
+
+    return extractTotal(w) + extractMain(m) + extractTotal(c);
+  }
+
+  // State untuk progress semua minggu
+  List<Map<String, dynamic>> _allWeeksProgress = [];
+  bool _isAllWeeksLoading = false;
+
+  List<Map<String, dynamic>> get allWeeksProgress => _allWeeksProgress;
+  bool get isAllWeeksLoading => _isAllWeeksLoading;
+
+  /// Mengambil progress untuk SEMUA minggu (untuk PageView di home)
+  Future<void> fetchAllWeeksProgress() async {
+    try {
+      _isAllWeeksLoading = true;
+      notifyListeners();
+
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return;
+
+      final weeksResponse = await _supabase
+          .schema('runmates')
+          .from('program_weeks')
+          .select('id, week_number')
+          .eq('user_id', userId)
+          .order('week_number', ascending: true);
+
+      final List<dynamic> weeks = weeksResponse;
+      List<Map<String, dynamic>> results = [];
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      for (var week in weeks) {
+        final int weekId = week['id'];
+        final int weekNumber = week['week_number'];
+
+        final schedulesResponse = await _supabase
             .schema('runmates')
             .from('daily_schedules')
             .select()
             .eq('user_id', userId)
-            .gte('scheduled_date', todayStr)
-            .eq('is_done', false)
-            .order('scheduled_date', ascending: true)
-            .limit(1)
-            .maybeSingle();
+            .eq('week_id', weekId)
+            .order('scheduled_date', ascending: true);
 
-        if (nextWorkoutResponse != null) {
-          final String currentTitle =
-              nextWorkoutResponse['workout_title'] ?? '';
+        final List<dynamic> rawSchedules = schedulesResponse;
+        final schedules = rawSchedules
+            .map((json) => DailyScheduleModel.fromJson(json))
+            .toList();
 
-          if (!currentTitle.contains('(Extra Load)')) {
-            final int currentDuration =
-                nextWorkoutResponse['duration_minutes'] ?? 0;
-            final int newDuration = currentDuration + 15;
+        final completed = schedules.where((s) {
+          final isRest = s.workoutTitle.toLowerCase().contains('rest');
+          final scheduleDate = DateTime(
+            s.scheduledDate.year,
+            s.scheduledDate.month,
+            s.scheduledDate.day,
+          );
+          final isPast = scheduleDate.isBefore(today);
 
-            Map<String, dynamic> currentSteps = Map<String, dynamic>.from(
-              nextWorkoutResponse['steps'] ?? {},
-            );
-            String mainStep = currentSteps['main']?.toString() ?? '';
+          return s.isDone || (isRest && isPast);
+        }).toList();
 
-            // Apakah ini latihan Interval? (Ada format "6 x 400m")
-            if (mainStep.contains(RegExp(r'\d+\s*x'))) {
-              // Cari angka sebelum huruf 'x' (contoh: "6" dari "6 x 400m")
-              final intervalRegex = RegExp(r'(\d+)(\s*x)');
-              mainStep = mainStep.replaceAllMapped(intervalRegex, (match) {
-                int reps = int.tryParse(match.group(1) ?? '0') ?? 0;
-                if (reps > 0) {
-                  // Hukuman: Tambah 2 repetisi (misal 6x jadi 8x)
-                  return "${reps + 2}${match.group(2)}";
-                }
-                return match.group(0)!;
-              });
-            }
-            // Apakah ini Lari Jarak Jauh? (Ada format "5 km" atau "5.0 km")
-            // Kita pakai lookbehind negatif (logic manual) untuk hindari "min/km" (pace)
-            else if (mainStep.contains('km')) {
-              final kmRegex = RegExp(r'(\d+(\.\d+)?)\s*km');
-              // Kita iterasi semua match, tapi biasanya jarak utama ada di awal atau setelah kata "total"
-              // Untuk simpelnya, kita ganti angka "km" pertama yang ditemukan yang nilainya masuk akal (bukan pace)
-              mainStep = mainStep.replaceAllMapped(kmRegex, (match) {
-                double val = double.tryParse(match.group(1) ?? '0') ?? 0;
-                // Filter: Jika angka < 15 kemungkinan itu jarak. Jika > 15 kemungkinan pace menit (kecuali ultramarathon).
-                // Atau kita pastikan tidak ada "min/" atau "menit/" sebelumnya (tapi regex dart lookbehind terbatas).
-                // Solusi aman: Tambah jarak hanya jika teks tidak mengandung format waktu "titik dua" sebelumnya (misal 5:30)
-                bool isPace = mainStep
-                    .substring(0, match.start)
-                    .trim()
-                    .endsWith(':');
+        final actuallyDone = schedules.where((s) => s.isDone).toList();
 
-                if (val > 0 && !isPace) {
-                  // Hukuman: Tambah 1.5 KM
-                  double newVal = val + 1.5;
-                  // Hapus .0 jika bulat
-                  String sVal = newVal.toString().replaceAll(
-                    RegExp(r'\.0$'),
-                    '',
-                  );
-                  return "$sVal km";
-                }
-                return match.group(0)!;
-              });
-            }
+        final totalDuration = actuallyDone.fold<int>(
+          0,
+          (sum, item) => sum + item.durationMinutes,
+        );
 
-            currentSteps['main'] = mainStep;
+        final totalDistance = actuallyDone.fold<double>(0.0, (sum, item) {
+          return sum + _parseDistanceFromSteps(item.steps);
+        });
 
-            await _supabase
-                .schema('runmates')
-                .from('daily_schedules')
-                .update({
-                  'workout_title': '$currentTitle (Extra Load)',
-                  'duration_minutes': newDuration,
-                  'steps': currentSteps,
-                  'workout_objective':
-                      'Target jarak & durasi ditingkatkan karena kamu melewatkan $missedCount sesi latihan.',
-                })
-                .eq('id', nextWorkoutResponse['id']);
-
-            fetchTodaySchedule();
-            fetchWeeklyProgress();
-
-            return true;
-          }
-        }
+        results.add({
+          'weekNumber': weekNumber,
+          'schedules': schedules,
+          'totalSessions': schedules.length,
+          'completedSessions': completed.length,
+          'totalDurationMinutes': totalDuration,
+          'totalDistance': totalDistance,
+        });
       }
-      return false;
+
+      _allWeeksProgress = results;
     } catch (e) {
-      debugPrint("Error applying penalty: $e");
-      return false;
+      debugPrint("Error fetching all weeks progress: $e");
+    } finally {
+      _isAllWeeksLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Helper format durasi (jam:menit) dari menit total
+  String formatHoursMinutes(int totalMinutes) {
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+    return '$hours:${minutes.toString().padLeft(2, '0')}';
+  }
+
+  /// Status day untuk minggu spesifik
+  /// 0 = tidak ada jadwal, 1 = belum, 2 = selesai (atau Rest Day yang sudah lewat), 3 = missed
+  int getDayStatusForWeek(List<DailyScheduleModel> schedules, int weekday) {
+    try {
+      final schedule = schedules.firstWhere(
+        (s) => s.scheduledDate.weekday == weekday,
+      );
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final scheduleDate = DateTime(
+        schedule.scheduledDate.year,
+        schedule.scheduledDate.month,
+        schedule.scheduledDate.day,
+      );
+      final isRest = schedule.workoutTitle.toLowerCase().contains('rest');
+      final isPast = scheduleDate.isBefore(today);
+
+      if (schedule.isDone || (isRest && isPast)) return 2;
+
+      if (isPast && !isRest) return 3;
+
+      return 1;
+    } catch (e) {
+      return 0;
     }
   }
 }
